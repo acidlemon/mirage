@@ -54,9 +54,7 @@ func NewMirage() *Mirage {
 		ReverseProxy: reverseproxy.ReverseProxy{
 			HostSuffix: ".example.net",
 		},
-		WebApi: webapi.WebApi{
-			Host: "localhost",
-		},
+		WebApi: webapi.NewWebApi("localhost"),
 		notFound: http.NotFoundHandler(),
 	}
 
@@ -93,7 +91,7 @@ func (app *Mirage) isDockerHost(host string) bool {
 }
 
 func (app *Mirage) isWebApiHost(host string) bool {
-	return isSameHost(app.WebApiHost, host)
+	return isSameHost(app.WebApi.Host, host)
 }
 
 func isSameHost(s1 string, s2 string) bool {
