@@ -9,6 +9,7 @@ import (
 
 	"github.com/acidlemon/mirage/reverseproxy"
 	"github.com/acidlemon/mirage/webapi"
+	_ "github.com/acidlemon/mirage/docker"
 
 //	"github.com/acidlemon/go-dumper"
 )
@@ -44,19 +45,16 @@ func main() {
 
 
 type Mirage struct {
-	ReverseProxy reverseproxy.ReverseProxy
-	WebApi webapi.WebApi
+	WebApi *webapi.WebApi
 	notFound http.Handler
 }
 
 func NewMirage() *Mirage {
 	mirage := &Mirage{
-		ReverseProxy: reverseproxy.ReverseProxy{
-			HostSuffix: ".example.net",
-		},
 		WebApi: webapi.NewWebApi("localhost"),
 		notFound: http.NotFoundHandler(),
 	}
+	reverseproxy.SetHostSuffix(".example.net")
 
 	return mirage
 }
@@ -67,7 +65,7 @@ func (app *Mirage) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	switch {
 	case app.isDockerHost(host):
 		fmt.Println("this is revproxy host")
-		app.ReverseProxy.ServeHTTP(w, req)
+		reverseproxy.ServeHTTP(w, req)
 
 	case app.isWebApiHost(host):
 		fmt.Println("this is webapi host")
@@ -81,7 +79,7 @@ func (app *Mirage) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (app *Mirage) isDockerHost(host string) bool {
-	if strings.HasSuffix(host, app.ReverseProxy.HostSuffix) {
+	if strings.HasSuffix(host, reverseproxy.DefaultReverseProxy.HostSuffix) {
 		// TODO search docker name
 
 		return true
