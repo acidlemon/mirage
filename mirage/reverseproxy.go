@@ -1,4 +1,4 @@
-package reverseproxy
+package mirage
 
 import (
 	"net/http"
@@ -10,24 +10,24 @@ import (
 //	"github.com/acidlemon/go-dumper"
 )
 
-var DefaultReverseProxy = NewReverseProxy()
+//var DefaultReverseProxy = NewReverseProxy()
 
-func NewReverseProxy() *ReverseProxy{
+type ReverseProxy struct {
+	cfg *Config
+	domainMap map[string]ProxyInformation
+}
+
+func NewReverseProxy(cfg *Config) *ReverseProxy{
 	return &ReverseProxy{
+		cfg: cfg,
 		domainMap: map[string]ProxyInformation{},
 	}
 }
 
 
-type ReverseProxy struct {
-	HostSuffix string
-	domainMap map[string]ProxyInformation
-}
-
-
-func ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	DefaultReverseProxy.ServeHTTP(w, req)
-}
+//func ServeHTTP(w http.ResponseWriter, req *http.Request) {
+//	DefaultReverseProxy.ServeHTTP(w, req)
+//}
 func (r *ReverseProxy) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	subdomain := strings.ToLower(strings.Split(req.Host, ".")[0])
 
@@ -48,18 +48,18 @@ type ProxyInformation struct {
 	proxyHandler http.Handler
 }
 
-func AddSubdomain(subdomain string, ipaddress string) {
-	fmt.Println("AddSubdomain")
-	DefaultReverseProxy.AddSubdomain(subdomain, ipaddress)
-}
+//func AddSubdomain(subdomain string, ipaddress string) {
+//	fmt.Println("AddSubdomain")
+//	DefaultReverseProxy.AddSubdomain(subdomain, ipaddress)
+//}
 
-func RemoveSubdomain(subdomain string) {
-	DefaultReverseProxy.RemoveSubdomain(subdomain)
-}
+//func RemoveSubdomain(subdomain string) {
+//	DefaultReverseProxy.RemoveSubdomain(subdomain)
+//}
 
-func SetHostSuffix(suffix string) {
-	DefaultReverseProxy.HostSuffix = suffix
-}
+//func SetHostSuffix(suffix string) {
+//	DefaultReverseProxy.HostSuffix = suffix
+//}
 
 func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 	// create reverse proxy

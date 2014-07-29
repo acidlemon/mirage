@@ -1,4 +1,4 @@
-package docker
+package mirage
 
 import (
 	"fmt"
@@ -7,13 +7,10 @@ import (
 	"errors"
 	"sort"
 
-	"github.com/acidlemon/mirage/reverseproxy"
-
 	"github.com/fsouza/go-dockerclient"
 	"github.com/acidlemon/go-dumper"
 )
 
-var endpoint = "unix:///var/run/docker.sock"
 
 type Information struct {
 	ID        string `json:"id"`
@@ -23,12 +20,20 @@ type Information struct {
 	IPAddress string `json:"ipaddress"`
 }
 
-func SetEndpoint(e string) {
-	endpoint = e
+type Docker struct {
+	cfg *Config
 }
 
-func Launch(subdomain string, gitbranch string, image string) error {
-	client, err := docker.NewClient(endpoint)
+func NewDocker(cfg *Config) *Docker {
+	d := &Docker{
+		cfg: cfg,
+	}
+
+	return d
+}
+
+func (d *Docker) Launch(subdomain string, gitbranch string, image string) error {
+	client, err := docker.NewClient(d.cfg.DockerEndpoint)
 	if err != nil {
 		fmt.Println("cannot create docker client")
 		return err
@@ -75,12 +80,12 @@ func Launch(subdomain string, gitbranch string, image string) error {
 	}
 
 	ms.AddToSubdomainMap(subdomain)
-	reverseproxy.AddSubdomain(subdomain, container.NetworkSettings.IPAddress)
+	app.ReverseProxy.AddSubdomain(subdomain, container.NetworkSettings.IPAddress)
 
 	return nil
 }
 
-func Terminate(subdomain string) error {
+func (d *Docker) Terminate(subdomain string) error {
 	ms := NewMirageStorage()
 	defer ms.Close()
 	data, err := ms.Get(fmt.Sprintf("subdomain:%s", subdomain))
@@ -95,7 +100,7 @@ func Terminate(subdomain string) error {
 	dump.Dump(info)
 	containerID := string(info.ID)
 
-	client, err := docker.NewClient(endpoint)
+	client, err := docker.NewClient(d.cfg.DockerEndpoint)
 	if err != nil {
 		errors.New("cannot create docker client")
 	}
@@ -106,7 +111,7 @@ func Terminate(subdomain string) error {
 	}
 
 	ms.RemoveFromSubdomainMap(subdomain)
-	reverseproxy.RemoveSubdomain(subdomain)
+	app.ReverseProxy.RemoveSubdomain(subdomain)
 
 	return nil
 }
@@ -124,8 +129,8 @@ func (c ContainerSlice) Swap(i, j int) {
 }
 
 
-func List() ([]Information, error) {
-	client, err := docker.NewClient(endpoint)
+func (d *Docker) List() ([]Information, error) {
+	client, err := docker.NewClient(d.cfg.DockerEndpoint)
 	if err != nil {
 		fmt.Println("cannot create docker client")
 		log.Fatal(err)
@@ -162,18 +167,6 @@ func List() ([]Information, error) {
 	}
 
 	return result, nil
-}
-
-
-func init() {
-	infolist, err := List()
-	if err != nil {
-		fmt.Println("cannot initialize reverse proxy: ", err.Error())
-	}
-
-	for _, info := range infolist {
-		reverseproxy.AddSubdomain(info.SubDomain, info.IPAddress)
-	}
 }
 
 

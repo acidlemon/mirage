@@ -1,10 +1,8 @@
-package webapi
+package mirage
 
 import (
 	"net/http"
 	"fmt"
-
-	"github.com/acidlemon/mirage/docker"
 
 	"github.com/acidlemon/rocket"
 )
@@ -12,14 +10,14 @@ import (
 
 type WebApi struct {
 	rocket.WebApp
-	Host string
+	cfg *Config
 }
 
 
-func NewWebApi(host string) *WebApi {
+func NewWebApi(cfg *Config) *WebApi {
 	app := &WebApi{}
 	app.Init()
-	app.Host = host
+	app.cfg = cfg
 
 	app.AddRoute("/", app.List, &rocket.View{})
 	app.AddRoute("/api/list", app.ApiList, &rocket.View{})
@@ -31,11 +29,11 @@ func NewWebApi(host string) *WebApi {
 	return app
 }
 
-func (app *WebApi) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	app.Handler(w, req)
+func (api *WebApi) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	api.Handler(w, req)
 }
 
-func (app *WebApi) List(c rocket.CtxData) {
+func (api *WebApi) List(c rocket.CtxData) {
 	c.Res().StatusCode = http.StatusOK
 	value := rocket.RenderVars {
 		"test" : "powawa",
@@ -44,8 +42,8 @@ func (app *WebApi) List(c rocket.CtxData) {
 	c.Render("webapi/list.html", value)
 }
 
-func (app *WebApi) ApiList(c rocket.CtxData) {
-	info, err := docker.List()
+func (api *WebApi) ApiList(c rocket.CtxData) {
+	info, err := app.Docker.List()
 	var status interface{}
 	if err != nil {
 		status = err.Error()
@@ -60,7 +58,7 @@ func (app *WebApi) ApiList(c rocket.CtxData) {
 	c.RenderJSON(result)
 }
 
-func (app *WebApi) ApiLaunch(c rocket.CtxData) {
+func (api *WebApi) ApiLaunch(c rocket.CtxData) {
 	if c.Req().Method != "POST" {
 		c.Res().StatusCode = http.StatusMethodNotAllowed
 		c.RenderText("you must use POST")
@@ -77,7 +75,7 @@ func (app *WebApi) ApiLaunch(c rocket.CtxData) {
 		status = fmt.Sprintf("parameter required: subdomain=%s, branch=%s, image=%s",
 			subdomain, branch, image)
 	} else {
-		err := docker.Launch(subdomain, branch, image)
+		err := app.Docker.Launch(subdomain, branch, image)
 		if err != nil {
 			status = err.Error()
 		}
@@ -90,7 +88,7 @@ func (app *WebApi) ApiLaunch(c rocket.CtxData) {
 	c.RenderJSON(result)
 }
 
-func (app *WebApi) ApiTerminate(c rocket.CtxData) {
+func (api *WebApi) ApiTerminate(c rocket.CtxData) {
 	if c.Req().Method != "POST" {
 		c.Res().StatusCode = http.StatusMethodNotAllowed
 		c.RenderText("you must use POST")
@@ -103,7 +101,7 @@ func (app *WebApi) ApiTerminate(c rocket.CtxData) {
 	if subdomain == "" {
 		status = fmt.Sprintf("parameter required: subdomain")
 	} else {
-		err := docker.Terminate(subdomain)
+		err := app.Docker.Terminate(subdomain)
 
 		if err != nil {
 			status = err.Error()
