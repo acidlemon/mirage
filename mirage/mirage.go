@@ -59,7 +59,7 @@ func Setup(cfg *Config) {
 	}
 
 	for _, info := range infolist {
-		app.ReverseProxy.AddSubdomain(info.SubDomain, info.IPAddress)
+		m.ReverseProxy.AddSubdomain(info.SubDomain, info.IPAddress)
 	}
 
 	app = m

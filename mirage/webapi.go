@@ -39,7 +39,7 @@ func (api *WebApi) List(c rocket.CtxData) {
 		"test" : "powawa",
 	}
 
-	c.Render("webapi/list.html", value)
+	c.Render("html/list.html", value)
 }
 
 func (api *WebApi) ApiList(c rocket.CtxData) {
