@@ -13,7 +13,7 @@ import (
 var app *Mirage
 
 type Config struct {
-	ForeignHost string
+	ForeignAddress string
 	WebApiHost string
 	ReverseProxyHostSuffix string
 	ListenPorts map[int]int // map[ListenPort] = ProxyPassPort
@@ -24,7 +24,7 @@ type Config struct {
 func NewConfig() *Config {
 	// default config
 	cfg := &Config{
-		ForeignHost: "127.0.0.1",
+		ForeignAddress: "127.0.0.1",
 		WebApiHost: "localhost",
 		ReverseProxyHostSuffix: ".example.net",
 		ListenPorts: map[int]int{ 8080: 8080 },
@@ -72,7 +72,7 @@ func Run() {
 		wg.Add(1)
 		go func(port int) {
 			defer wg.Done()
-			laddr := fmt.Sprintf("%s:%d", app.Config.ForeignHost, port)
+			laddr := fmt.Sprintf("%s:%d", app.Config.ForeignAddress, port)
 			listener, err := net.Listen("tcp", laddr)
 			if err != nil {
 				fmt.Println("cannot listen %s", laddr)
