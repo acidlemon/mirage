@@ -91,11 +91,11 @@ func (m *Mirage) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	host := strings.ToLower(strings.Split(req.Host, ":")[0])
 
 	switch {
-	case m.isDockerHost(host):
-		m.ReverseProxy.ServeHTTP(w, req)
-
 	case m.isWebApiHost(host):
 		m.WebApi.ServeHTTP(w, req)
+
+	case m.isDockerHost(host):
+		m.ReverseProxy.ServeHTTP(w, req)
 
 	default:
 		// return 404
