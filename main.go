@@ -38,7 +38,7 @@ func ParseArgs(cfg *mirage.Config) error {
 	flag.Parse()
 
 	if *domainSuffix == "" {
-		return errors.New("--domain-suffix is required.")
+		return errors.New("-domain-suffix is required.")
 	}
 
 	cfg.ForeignAddress = *foreignAddress
