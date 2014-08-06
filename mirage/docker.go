@@ -63,6 +63,15 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 	ms := NewMirageStorage()
 	defer ms.Close()
 
+	// terminate old container
+	oldContainerID := d.getContainerIDFromSubdomain(subdomain, ms)
+	if oldContainerID != "" {
+		err = client.StopContainer(oldContainerID, 10)
+		if err != nil {
+			fmt.Printf(err.Error()) // TODO log warning
+		}
+	}
+
 	info := Information{
 		ID: container.ID,
 		SubDomain: subdomain,
@@ -85,20 +94,28 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 	return nil
 }
 
-func (d *Docker) Terminate(subdomain string) error {
-	ms := NewMirageStorage()
-	defer ms.Close()
+func (d *Docker) getContainerIDFromSubdomain(subdomain string, ms *MirageStorage) string {
 	data, err := ms.Get(fmt.Sprintf("subdomain:%s", subdomain))
 	if err != nil {
 		if err == ErrNotFound {
-			return errors.New(fmt.Sprintf("no such subdomain: %s", subdomain))
+			return ""
 		}
-		return errors.New(fmt.Sprintf("cannot find subdomain:%s, err:%s", subdomain, err.Error()))
+		fmt.Printf("cannot find subdomain:%s, err:%s", subdomain, err.Error())
+		return ""
 	}
 	var info Information
 	json.Unmarshal(data, &info)
 	dump.Dump(info)
 	containerID := string(info.ID)
+
+	return containerID
+}
+
+func (d *Docker) Terminate(subdomain string) error {
+	ms := NewMirageStorage()
+	defer ms.Close()
+
+	containerID := d.getContainerIDFromSubdomain(subdomain, ms)
 
 	client, err := docker.NewClient(d.cfg.DockerEndpoint)
 	if err != nil {
