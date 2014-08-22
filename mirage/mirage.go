@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"sort"
 
 //	"github.com/acidlemon/go-dumper"
 )
@@ -41,7 +42,6 @@ type Mirage struct {
 	WebApi *WebApi
 	ReverseProxy *ReverseProxy
 	Docker *Docker
-	notFound http.Handler
 }
 
 func Setup(cfg *Config) {
@@ -50,7 +50,6 @@ func Setup(cfg *Config) {
 		WebApi: NewWebApi(cfg),
 		ReverseProxy: NewReverseProxy(cfg),
 		Docker: NewDocker(cfg),
-		notFound: http.NotFoundHandler(),
 	}
 
 	infolist, err := m.Docker.List()
@@ -78,7 +77,13 @@ func Run() {
 				fmt.Println("cannot listen %s", laddr)
 				return
 			}
-			http.Serve(listener, app)
+
+			mux := http.NewServeMux()
+			mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+				app.ServeHTTPWithPort(w, req, port)
+			})
+
+			http.Serve(listener, mux)
 		}(k)
 	}
 
@@ -87,7 +92,7 @@ func Run() {
 	wg.Wait()
 }
 
-func (m *Mirage) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (m *Mirage) ServeHTTPWithPort(w http.ResponseWriter, req *http.Request, port int) {
 	host := strings.ToLower(strings.Split(req.Host, ":")[0])
 
 	switch {
@@ -95,20 +100,31 @@ func (m *Mirage) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.WebApi.ServeHTTP(w, req)
 
 	case m.isDockerHost(host):
-		m.ReverseProxy.ServeHTTP(w, req)
+		m.ReverseProxy.ServeHTTPWithPort(w, req, port)
 
 	default:
 		// return 404
-		m.notFound.ServeHTTP(w, req)
+		http.NotFound(w, req)
 	}
 
 }
 
 func (m *Mirage) isDockerHost(host string) bool {
 	if strings.HasSuffix(host, m.Config.ReverseProxyHostSuffix) {
-		// TODO search docker name
+		ms := NewMirageStorage()
+		subdomainList, err := ms.GetSubdomainList()
+		if err != nil {
+			return false
+		}
 
-		return true
+		subdomain := strings.ToLower(strings.Split(host, ".")[0])
+		index := sort.StringSlice(subdomainList).Search(subdomain)
+		if index < len(subdomainList) && subdomainList[index] == subdomain {
+			// found
+			return true
+		}
+
+		return false
 	} 
 
 	return false

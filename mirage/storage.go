@@ -50,7 +50,7 @@ func (ms *MirageStorage) Set(key string, value []byte) error {
 }
 
 func (ms *MirageStorage) AddToSubdomainMap(subdomain string) error {
-	subdomainMap, err := ms.GetSubdomainMap()
+	subdomainMap, err := ms.getSubdomainMap()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to get subdomain-map: %s", err.Error()))
 	}
@@ -69,7 +69,7 @@ func (ms *MirageStorage) AddToSubdomainMap(subdomain string) error {
 }
 
 func (ms *MirageStorage) RemoveFromSubdomainMap(subdomain string) error {
-	subdomainMap, err := ms.GetSubdomainMap()
+	subdomainMap, err := ms.getSubdomainMap()
 	if err != nil {
 		return errors.New(fmt.Sprintf("failed to get subdomain-map: %s", err.Error()))
 	}
@@ -85,7 +85,7 @@ func (ms *MirageStorage) RemoveFromSubdomainMap(subdomain string) error {
 	return ms.updateSubdomainMap(subdomainMap)
 }
 
-func (ms *MirageStorage) GetSubdomainMap() (map[string]int, error) {
+func (ms *MirageStorage) getSubdomainMap() (map[string]int, error) {
 	subdomainData, err := ms.Get("subdomain-map")
 	if err != nil {
 		if err != ErrNotFound {
@@ -94,7 +94,7 @@ func (ms *MirageStorage) GetSubdomainMap() (map[string]int, error) {
 		subdomainData = []byte(`{}`)
 	}
 
-	// Q. why map?  A. easy to manage subdomains as unique
+	// Q. Why map?  A. It's easy to manage subdomains as unique
 	var subdomainMap map[string]int
 	err = json.Unmarshal(subdomainData, &subdomainMap)
 	if err != nil {
@@ -104,8 +104,22 @@ func (ms *MirageStorage) GetSubdomainMap() (map[string]int, error) {
 	return subdomainMap, nil
 }
 
+func (ms *MirageStorage) GetSubdomainList() ([]string, error) {
+	subdomainMap, err := ms.getSubdomainMap()
+	if err != nil {
+		return []string{}, err
+	}
+
+	result := []string{}
+	for k, _ := range subdomainMap {
+		result = append(result, k)
+	}
+
+	return result, nil
+}
+
+
 func (ms *MirageStorage) updateSubdomainMap(subdomainMap map[string]int) error {
-	fmt.Println("willUpdate")
 	dump.Dump(subdomainMap)
 	subdomainData, err := json.Marshal(subdomainMap)
 

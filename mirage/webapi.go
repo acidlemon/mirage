@@ -20,6 +20,9 @@ func NewWebApi(cfg *Config) *WebApi {
 	app.cfg = cfg
 
 	app.AddRoute("/", app.List, &rocket.View{})
+	app.AddRoute("/launcher", app.Launcher, &rocket.View{})
+	app.AddRoute("/launch", app.Launch, &rocket.View{})
+	app.AddRoute("/terminate", app.Terminate, &rocket.View{})
 	app.AddRoute("/api/list", app.ApiList, &rocket.View{})
 	app.AddRoute("/api/launch", app.ApiLaunch, &rocket.View{})
 	app.AddRoute("/api/terminate", app.ApiTerminate, &rocket.View{})
@@ -34,12 +37,39 @@ func (api *WebApi) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 }
 
 func (api *WebApi) List(c rocket.CtxData) {
-	c.Res().StatusCode = http.StatusOK
+	info, err := app.Docker.List()
+	errStr := ""
+	if err != nil {
+		errStr = err.Error()
+	}
 	value := rocket.RenderVars {
-		"test" : "powawa",
+		"info" : info,
+		"error": errStr,
 	}
 
 	c.Render("html/list.html", value)
+}
+
+func (api *WebApi) Launcher(c rocket.CtxData) {
+	c.Render("html/launcher.html", rocket.RenderVars{})
+}
+
+func (api *WebApi) Launch(c rocket.CtxData) {
+	result := api.launch(c)
+	if result["result"] == "ok" {
+		c.Redirect("/")
+	} else {
+		c.RenderJSON(result)
+	}
+}
+
+func (api *WebApi) Terminate(c rocket.CtxData) {
+	result := api.terminate(c)
+	if result["result"] == "ok" {
+		c.Redirect("/")
+	} else {
+		c.RenderJSON(result)
+	}
 }
 
 func (api *WebApi) ApiList(c rocket.CtxData) {
@@ -59,10 +89,22 @@ func (api *WebApi) ApiList(c rocket.CtxData) {
 }
 
 func (api *WebApi) ApiLaunch(c rocket.CtxData) {
+	result := api.launch(c)
+
+	c.RenderJSON(result)
+}
+
+func (api *WebApi) ApiTerminate(c rocket.CtxData) {
+	result := api.terminate(c)
+
+	c.RenderJSON(result)
+}
+
+func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 	if c.Req().Method != "POST" {
 		c.Res().StatusCode = http.StatusMethodNotAllowed
 		c.RenderText("you must use POST")
-		return
+		return rocket.RenderVars{}
 	}
 
 	subdomain, _ := c.ParamSingle("subdomain")
@@ -85,14 +127,14 @@ func (api *WebApi) ApiLaunch(c rocket.CtxData) {
 		"result": status,
 	}
 
-	c.RenderJSON(result)
+	return result
 }
 
-func (api *WebApi) ApiTerminate(c rocket.CtxData) {
+func (api *WebApi) terminate(c rocket.CtxData) rocket.RenderVars {
 	if c.Req().Method != "POST" {
 		c.Res().StatusCode = http.StatusMethodNotAllowed
 		c.RenderText("you must use POST")
-		return
+		return rocket.RenderVars{}
 	}
 
 	status := "ok"
@@ -112,7 +154,6 @@ func (api *WebApi) ApiTerminate(c rocket.CtxData) {
 		"result": status,
 	}
 
-	c.RenderJSON(result)
+	return result
 }
-
 

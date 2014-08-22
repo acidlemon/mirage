@@ -14,6 +14,7 @@ import (
 
 type Information struct {
 	ID        string `json:"id"`
+	ShortID   string `json:"short_id"`
 	SubDomain string `json:"subdomain"`
 	GitBranch string `json:"branch"`
 	Image     string `json:"image"`
@@ -66,7 +67,7 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 	// terminate old container
 	oldContainerID := d.getContainerIDFromSubdomain(subdomain, ms)
 	if oldContainerID != "" {
-		err = client.StopContainer(oldContainerID, 10)
+		err = client.StopContainer(oldContainerID, 5)
 		if err != nil {
 			fmt.Printf(err.Error()) // TODO log warning
 		}
@@ -74,6 +75,7 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 
 	info := Information{
 		ID: container.ID,
+		ShortID: container.ID[0:12],
 		SubDomain: subdomain,
 		GitBranch: gitbranch,
 		Image: image,
@@ -122,7 +124,7 @@ func (d *Docker) Terminate(subdomain string) error {
 		errors.New("cannot create docker client")
 	}
 
-	err = client.StopContainer(containerID, 10)
+	err = client.StopContainer(containerID, 5)
 	if err != nil {
 		return err
 	}
@@ -154,7 +156,7 @@ func (d *Docker) List() ([]Information, error) {
 	}
 
 	ms := NewMirageStorage()
-	subdomainMap, err := ms.GetSubdomainMap()
+	subdomainList, err := ms.GetSubdomainList()
 	if err != nil {
 		return nil, err
 	}
@@ -163,8 +165,7 @@ func (d *Docker) List() ([]Information, error) {
 	sort.Sort(ContainerSlice(containers))
 
 	result := []Information{}
-	dump.Dump(subdomainMap)
-	for subdomain, _ := range subdomainMap {
+	for _, subdomain := range subdomainList {
 		infoData, err := ms.Get(fmt.Sprintf("subdomain:%s", subdomain))
 		if err != nil {
 			fmt.Printf("ms.Get failed err=%s\n", err.Error())

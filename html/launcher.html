@@ -8,23 +8,6 @@ body {
 }
 </style>
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
-
-<style type="text/css">
-.glyphicon-refresh-animate {
-    -animation: spin .7s infinite linear;
-    -webkit-animation: spin2 .7s infinite linear;
-}
-
-@-webkit-keyframes spin2 {
-    from { -webkit-transform: rotate(0deg);}
-    to { -webkit-transform: rotate(360deg);}
-}
-
-@keyframes spin {
-    from { transform: scale(1) rotate(0deg);}
-    to { transform: scale(1) rotate(360deg);}
-}
-</style>
 </head>
 <body>
 
@@ -69,45 +52,18 @@ body {
 
 <div class="container">
 <div class="row">
-<h1>Current Container List</h1>
+<h1>Launch Container</h1>
 
-<p><a href="/launcher" class="btn btn-primary">Launch New Container</a></p>
-
-{{ if .error  }}
-<p>Error occurred while retreiving information. Detail: {{ .error }} </p>
-{{ else }}
-
-<form id="termination" method="POST" action="/terminate">
-<input type="hidden" name="subdomain" value="" id="subdomain">
-<table class="table table-striped table-bordered">
-<thead>
-  <tr><td>subdomain</td><td>branch</td><td>image</td><td>container ID</td><td></td></tr>
-</thead>
-<tbody>
-{{ range $row := .info }}
-  <tr>
-    <td>{{ $row.SubDomain }}</td>
-    <td>{{ $row.GitBranch }}</td>
-    <td>{{ $row.Image }}</td>
-    <td>{{ $row.ShortID }}</td>
-    <td><a href="#" class="btn btn-danger" role="button" onclick="terminate(&quot;{{ $row.SubDomain }}&quot;)" id="terminate-{{ $row.SubDomain }}">Terminate</a></td>
-  </tr>
-{{ end }}
-</tbody>
-</table>
-{{ end }}
-
+<form id="launcher" method="POST" action="/launch">
+<p><label for="subdomain">subdomain: </label> <input type="text" name="subdomain" value="" id="subdomain"></p>
+<p><label for="branch">branch: </label><input type="text" name="branch" value="" id="branch"></p>
+<p><label for="image">image: </label><input type="text" name="image" value="nikuapp:latest" id="image"></p>
+<p><input type="submit" class="btn btn-primary"></p>
+</form>
 </div>
 </div>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-<script type="text/javascript">
-function terminate(subdomain) {
-    $("#subdomain").attr("value", subdomain);
-    $("#terminate-" + subdomain).html('<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Terminating...')
-    $("#termination").submit();
-}
-</script>
 </body>
 </html>

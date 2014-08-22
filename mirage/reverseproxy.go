@@ -10,8 +10,6 @@ import (
 //	"github.com/acidlemon/go-dumper"
 )
 
-//var DefaultReverseProxy = NewReverseProxy()
-
 type ReverseProxy struct {
 	cfg *Config
 	domainMap map[string]ProxyInformation
@@ -24,55 +22,49 @@ func NewReverseProxy(cfg *Config) *ReverseProxy{
 	}
 }
 
-
-//func ServeHTTP(w http.ResponseWriter, req *http.Request) {
-//	DefaultReverseProxy.ServeHTTP(w, req)
-//}
-func (r *ReverseProxy) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (r *ReverseProxy) ServeHTTPWithPort(w http.ResponseWriter, req *http.Request, port int) {
 	subdomain := strings.ToLower(strings.Split(req.Host, ".")[0])
 
+	fmt.Println("host is", req.Host)
 	if _, ok := r.domainMap[subdomain]; !ok {
 		fmt.Println("subdomain not found: ", subdomain)
-		http.NotFoundHandler().ServeHTTP(w, req)
+		http.NotFound(w, req)
 		return
 	}
 
-	fmt.Println("found subdomain:", subdomain)
+	fmt.Println("found subdomain:", subdomain, "port:", port)
 
-	r.domainMap[subdomain].proxyHandler.ServeHTTP(w, req)
+	if handler, ok := r.domainMap[subdomain].proxyHandlers[port]; ok {
+		handler.ServeHTTP(w, req)
+	} else {
+		http.NotFound(w, req)
+	}
 }
 
 
 type ProxyInformation struct {
 	IPAddress string
-	proxyHandler http.Handler
+	proxyHandlers map[int]http.Handler
 }
 
-//func AddSubdomain(subdomain string, ipaddress string) {
-//	fmt.Println("AddSubdomain")
-//	DefaultReverseProxy.AddSubdomain(subdomain, ipaddress)
-//}
-
-//func RemoveSubdomain(subdomain string) {
-//	DefaultReverseProxy.RemoveSubdomain(subdomain)
-//}
-
-//func SetHostSuffix(suffix string) {
-//	DefaultReverseProxy.HostSuffix = suffix
-//}
-
 func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
+	handlers := make(map[int]http.Handler)
+
 	// create reverse proxy
-	destUrlString := fmt.Sprintf("http://%s:%d", ipaddress, 5000)
-	destUrl, _ := url.Parse(destUrlString)
-	handler := httputil.NewSingleHostReverseProxy(destUrl)
+	for listen, target := range r.cfg.ListenPorts {
+		destUrlString := fmt.Sprintf("http://%s:%d", ipaddress, target)
+		destUrl, _ := url.Parse(destUrlString)
+		handler := httputil.NewSingleHostReverseProxy(destUrl)
+
+		handlers[listen] = handler
+	}
 
 	fmt.Println("add subdomain: ", subdomain)
 
 	// add to map
 	r.domainMap[subdomain] = ProxyInformation{
 		IPAddress: ipaddress,
-		proxyHandler: handler,
+		proxyHandlers: handlers,
 	}
 }
 
