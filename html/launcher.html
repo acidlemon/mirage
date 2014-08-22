@@ -22,30 +22,6 @@ body {
       </button>
       <a class="navbar-brand" href="/">Mirage</a>
     </div>
-    <div class="navbar-collapse collapse">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="/">Home</a></li>
-        <!--li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
-          <ul class="dropdown-menu" role="menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Another action</a></li>
-            <li><a href="#">Something else here</a></li>
-            <li class="divider"></li>
-            <li class="dropdown-header">Nav header</li>
-            <li><a href="#">Separated link</a></li>
-            <li><a href="#">One more separated link</a></li>
-          </ul>
-        </li-->
-      </ul>
-      <!--ul class="nav navbar-nav navbar-right">
-        <li><a href="../navbar/">Default</a></li>
-        <li><a href="../navbar-static-top/">Static top</a></li>
-        <li class="active"><a href="./">Fixed top</a></li>
-      </ul-->
-    </div><!--/.nav-collapse -->
   </div>
 </div>
 
@@ -54,12 +30,29 @@ body {
 <div class="row">
 <h1>Launch Container</h1>
 
+<div class="col-md-6">
 <form id="launcher" method="POST" action="/launch">
-<p><label for="subdomain">subdomain: </label> <input type="text" name="subdomain" value="" id="subdomain"></p>
-<p><label for="branch">branch: </label><input type="text" name="branch" value="" id="branch"></p>
-<p><label for="image">image: </label><input type="text" name="image" value="nikuapp:latest" id="image"></p>
-<p><input type="submit" class="btn btn-primary"></p>
+<p>
+  <label for="subdomain" class="col-md-4 text-right">subdomain </label>
+  <input type="text" name="subdomain" value="" id="subdomain"
+         class="col-md-8" placeholder="mybranch">
+</p>
+<p>
+  <label for="branch" class="col-md-4 text-right">branch </label>
+  <input type="text" name="branch" value="" id="branch"
+         class="col-md-8" placeholder="feature/mine">
+</p>
+<p>
+  <label for="image" class="col-md-4 text-right">image </label>
+  <input type="text" name="image" value="{{ .DefaultImage }}" id="image"
+         class="col-md-8" placeholder="myapp:latest">
+</p>
+<p class="text-right">
+  <input type="submit" class="btn btn-primary">
+</p>
 </form>
+</div>
+
 </div>
 </div>
 

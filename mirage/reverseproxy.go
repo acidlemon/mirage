@@ -25,14 +25,11 @@ func NewReverseProxy(cfg *Config) *ReverseProxy{
 func (r *ReverseProxy) ServeHTTPWithPort(w http.ResponseWriter, req *http.Request, port int) {
 	subdomain := strings.ToLower(strings.Split(req.Host, ".")[0])
 
-	fmt.Println("host is", req.Host)
 	if _, ok := r.domainMap[subdomain]; !ok {
 		fmt.Println("subdomain not found: ", subdomain)
 		http.NotFound(w, req)
 		return
 	}
-
-	fmt.Println("found subdomain:", subdomain, "port:", port)
 
 	if handler, ok := r.domainMap[subdomain].proxyHandlers[port]; ok {
 		handler.ServeHTTP(w, req)
