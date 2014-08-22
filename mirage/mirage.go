@@ -20,6 +20,7 @@ type Config struct {
 	ListenPorts map[int]int // map[ListenPort] = ProxyPassPort
 	ListenSSLPorts map[int]int
 	DockerEndpoint string
+	DefaultImage string
 }
 
 func NewConfig() *Config {
@@ -31,6 +32,7 @@ func NewConfig() *Config {
 		ListenPorts: map[int]int{ 8080: 8080 },
 		ListenSSLPorts: map[int]int{},
 		DockerEndpoint: "unix:///var/run/docker.sock",
+		DefaultImage: "",
 	}
 
 	return cfg

@@ -35,6 +35,7 @@ func ParseArgs(cfg *mirage.Config) error {
 		"docker endpoint")
 	listen := flag.String("listen", "8080", 
 		"listen ports with mapping. you can specify multiple port using comma\nex) \"8080:5000,443\" ... listen 8080 and 443 port, and 8080 is proxy to 5000 port of backend")
+	defaultImage := flag.String("default-image", "", "default docker image")
 	flag.Parse()
 
 	if *domainSuffix == "" {
@@ -46,6 +47,7 @@ func ParseArgs(cfg *mirage.Config) error {
 	cfg.ReverseProxyHostSuffix = *domainSuffix
 	cfg.DockerEndpoint = *endpoint
 	cfg.ListenPorts = ParseListenPort(*listen)
+	cfg.DefaultImage = *defaultImage
 
 	return nil
 }
