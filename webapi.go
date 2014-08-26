@@ -19,13 +19,17 @@ func NewWebApi(cfg *Config) *WebApi {
 	app.Init()
 	app.cfg = cfg
 
-	app.AddRoute("/", app.List, &rocket.View{})
-	app.AddRoute("/launcher", app.Launcher, &rocket.View{})
-	app.AddRoute("/launch", app.Launch, &rocket.View{})
-	app.AddRoute("/terminate", app.Terminate, &rocket.View{})
-	app.AddRoute("/api/list", app.ApiList, &rocket.View{})
-	app.AddRoute("/api/launch", app.ApiLaunch, &rocket.View{})
-	app.AddRoute("/api/terminate", app.ApiTerminate, &rocket.View{})
+	view := &rocket.View{
+		BasicTemplates: []string{"html/layout.html"},
+	}
+
+	app.AddRoute("/", app.List, view)
+	app.AddRoute("/launcher", app.Launcher, view)
+	app.AddRoute("/launch", app.Launch, view)
+	app.AddRoute("/terminate", app.Terminate, view)
+	app.AddRoute("/api/list", app.ApiList, view)
+	app.AddRoute("/api/launch", app.ApiLaunch, view)
+	app.AddRoute("/api/terminate", app.ApiTerminate, view)
 
 	app.BuildRouter()
 
@@ -51,7 +55,9 @@ func (api *WebApi) List(c rocket.CtxData) {
 }
 
 func (api *WebApi) Launcher(c rocket.CtxData) {
-	c.Render("html/launcher.html", rocket.RenderVars{"DefaultImage": api.cfg.DefaultImage})
+	c.Render("html/launcher.html", rocket.RenderVars{
+		"DefaultImage": api.cfg.Docker.DefaultImage,
+	})
 }
 
 func (api *WebApi) Launch(c rocket.CtxData) {

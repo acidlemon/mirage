@@ -34,7 +34,7 @@ func NewDocker(cfg *Config) *Docker {
 }
 
 func (d *Docker) Launch(subdomain string, gitbranch string, image string) error {
-	client, err := docker.NewClient(d.cfg.DockerEndpoint)
+	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
 	if err != nil {
 		fmt.Println("cannot create docker client")
 		return err
@@ -119,7 +119,7 @@ func (d *Docker) Terminate(subdomain string) error {
 
 	containerID := d.getContainerIDFromSubdomain(subdomain, ms)
 
-	client, err := docker.NewClient(d.cfg.DockerEndpoint)
+	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
 	if err != nil {
 		errors.New("cannot create docker client")
 	}
@@ -149,7 +149,7 @@ func (c ContainerSlice) Swap(i, j int) {
 
 
 func (d *Docker) List() ([]Information, error) {
-	client, err := docker.NewClient(d.cfg.DockerEndpoint)
+	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
 	if err != nil {
 		fmt.Println("cannot create docker client")
 		log.Fatal(err)

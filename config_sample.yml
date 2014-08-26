@@ -1,0 +1,33 @@
+
+host:
+  # web api host
+  # you can use API and Web interface through this host
+  webapi: docker.dev.example.net
+
+  # host suffix
+  # if you access to foo.dev.example.net, mirage search "foo" subdomain container
+  reverse_proxy_suffix: .dev.example.net
+
+listen:
+  # listen address
+  # default is only listen from localhost
+  foreign_address: 127.0.0.1
+
+  # listen port and reverse proxy port
+  # 8080:5000 means listen 8080 port and transport to cointainer's 5050 port
+  # if use same port, you can omit transport port
+  HTTP:
+    - 8080:5000
+
+  # not implemented
+  # we recommend to use frontend http(like nginx) to SSL termination
+  # HTTPS:
+  #   - 443
+
+docker:
+  # if you use docker through http, specify like "http://localhost:4243"
+  endpoint: unix:///var/run/docker.sock
+
+  # if you specify this, fill the form as default value on web interface.
+  # default_image: myapp:latest
+

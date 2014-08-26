@@ -13,32 +13,6 @@ import (
 
 var app *Mirage
 
-type Config struct {
-	ForeignAddress string
-	WebApiHost string
-	ReverseProxyHostSuffix string
-	ListenPorts map[int]int // map[ListenPort] = ProxyPassPort
-	ListenSSLPorts map[int]int
-	DockerEndpoint string
-	DefaultImage string
-}
-
-func NewConfig() *Config {
-	// default config
-	cfg := &Config{
-		ForeignAddress: "127.0.0.1",
-		WebApiHost: "localhost",
-		ReverseProxyHostSuffix: ".example.net",
-		ListenPorts: map[int]int{ 8080: 8080 },
-		ListenSSLPorts: map[int]int{},
-		DockerEndpoint: "unix:///var/run/docker.sock",
-		DefaultImage: "",
-	}
-
-	return cfg
-}
-
-
 type Mirage struct {
 	Config *Config
 	WebApi *WebApi
@@ -69,11 +43,11 @@ func Setup(cfg *Config) {
 func Run() {
 	// launch server
 	var wg sync.WaitGroup
-	for k, _ := range app.Config.ListenPorts {
+	for k, _ := range app.Config.Listen.HTTP {
 		wg.Add(1)
 		go func(port int) {
 			defer wg.Done()
-			laddr := fmt.Sprintf("%s:%d", app.Config.ForeignAddress, port)
+			laddr := fmt.Sprintf("%s:%d", app.Config.Listen.ForeignAddress, port)
 			listener, err := net.Listen("tcp", laddr)
 			if err != nil {
 				fmt.Println("cannot listen %s", laddr)
@@ -112,7 +86,7 @@ func (m *Mirage) ServeHTTPWithPort(w http.ResponseWriter, req *http.Request, por
 }
 
 func (m *Mirage) isDockerHost(host string) bool {
-	if strings.HasSuffix(host, m.Config.ReverseProxyHostSuffix) {
+	if strings.HasSuffix(host, m.Config.Host.ReverseProxySuffix) {
 		ms := NewMirageStorage()
 		subdomainList, err := ms.GetSubdomainList()
 		if err != nil {
@@ -133,7 +107,7 @@ func (m *Mirage) isDockerHost(host string) bool {
 }
 
 func (m *Mirage) isWebApiHost(host string) bool {
-	return isSameHost(m.Config.WebApiHost, host)
+	return isSameHost(m.Config.Host.WebApi, host)
 }
 
 func isSameHost(s1 string, s2 string) bool {
