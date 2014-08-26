@@ -7,24 +7,23 @@ import (
 	"errors"
 	"strings"
 	"strconv"
-	"github.com/acidlemon/mirage/mirage"
 )
 
 func main() {
 	fmt.Println("Launch succeeded!")
 
-	cfg := mirage.NewConfig()
+	cfg := NewConfig()
 
 	err := ParseArgs(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	mirage.Setup(cfg)
-	mirage.Run()
+	Setup(cfg)
+	Run()
 }
 
-func ParseArgs(cfg *mirage.Config) error {
+func ParseArgs(cfg *Config) error {
 	foreignAddress := flag.String("foreign-address", "127.0.0.1",
 		"Listening foreign address")
 	webApiHost := flag.String("webapi-host", "localhost",

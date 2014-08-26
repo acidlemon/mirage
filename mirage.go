@@ -1,4 +1,4 @@
-package mirage
+package main
 
 import (
 	"sync"
