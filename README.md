@@ -25,7 +25,7 @@ listen:
 
 Prerequisite: you should resolve `*.dev.example.net` to your docker host.
 
-# Using CLI
+### Using CLI
 
 3. Launch docker container using curl.
 ```
@@ -42,7 +42,8 @@ curl http://docker.dev.example.net/api/terminate \
   -d subdomain=cool-feature
 ```
 
-# Using Web Interface
+### Using Web Interface
+
 3. Access to mirage web interface via "http://docker.dev.example.net/".
 4. Press "Launch New Container".
 5. Fill launch options.
