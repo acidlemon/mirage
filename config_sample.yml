@@ -2,7 +2,8 @@
 host:
   # web api host
   # you can use API and Web interface through this host
-  webapi: docker.dev.example.net
+  # webapi: docker.dev.example.net
+  webapi: localhost
 
   # host suffix
   # if you access to foo.dev.example.net, mirage search "foo" subdomain container
