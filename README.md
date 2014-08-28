@@ -61,7 +61,11 @@ environment variables.
 Setup
 ------
 
-(write in progress :)
+1. Download [binary](https://github.com/acidlemon/mirage/releases) or `go get`
+2. Rename `config_sample.yml` to `config.yml`
+3. Edit `config.yml` to your environment
+4. Change your domain setting to fit your `config.yml`
+5. Run `mirage`
 
 
 License
