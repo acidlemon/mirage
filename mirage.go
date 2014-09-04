@@ -43,7 +43,7 @@ func Setup(cfg *Config) {
 func Run() {
 	// launch server
 	var wg sync.WaitGroup
-	for k, _ := range app.Config.Listen.HTTP {
+	for _, v := range app.Config.Listen.HTTP {
 		wg.Add(1)
 		go func(port int) {
 			defer wg.Done()
@@ -59,8 +59,9 @@ func Run() {
 				app.ServeHTTPWithPort(w, req, port)
 			})
 
+			fmt.Println("listen port:", port)
 			http.Serve(listener, mux)
-		}(k)
+		}(v.ListenPort)
 	}
 
 	// TODO SSL Support

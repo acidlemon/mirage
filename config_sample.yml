@@ -15,10 +15,10 @@ listen:
   foreign_address: 127.0.0.1
 
   # listen port and reverse proxy port
-  # 8080:5000 means listen 8080 port and transport to cointainer's 5050 port
-  # if use same port, you can omit transport port
-  HTTP:
-    - 8080:5000
+  http:
+    # listen 8080 and transport to container's 5000 port
+    - listen: 8080
+      target: 5000
 
   # not implemented
   # we recommend to use frontend http(like nginx) to SSL termination

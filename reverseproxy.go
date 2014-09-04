@@ -48,12 +48,12 @@ func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 	handlers := make(map[int]http.Handler)
 
 	// create reverse proxy
-	for listen, target := range r.cfg.Listen.HTTP {
-		destUrlString := fmt.Sprintf("http://%s:%d", ipaddress, target)
+	for _, v := range r.cfg.Listen.HTTP {
+		destUrlString := fmt.Sprintf("http://%s:%d", ipaddress, v.TargetPort)
 		destUrl, _ := url.Parse(destUrlString)
 		handler := httputil.NewSingleHostReverseProxy(destUrl)
 
-		handlers[listen] = handler
+		handlers[v.ListenPort] = handler
 	}
 
 	fmt.Println("add subdomain: ", subdomain)
