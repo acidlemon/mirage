@@ -1,31 +1,29 @@
 package main
 
 import (
-	"sync"
 	"fmt"
 	"net"
 	"net/http"
-	"strings"
 	"sort"
-
-//	"github.com/acidlemon/go-dumper"
+	"strings"
+	"sync"
 )
 
 var app *Mirage
 
 type Mirage struct {
-	Config *Config
-	WebApi *WebApi
+	Config       *Config
+	WebApi       *WebApi
 	ReverseProxy *ReverseProxy
-	Docker *Docker
+	Docker       *Docker
 }
 
 func Setup(cfg *Config) {
 	m := &Mirage{
-		Config: cfg,
-		WebApi: NewWebApi(cfg),
+		Config:       cfg,
+		WebApi:       NewWebApi(cfg),
 		ReverseProxy: NewReverseProxy(cfg),
-		Docker: NewDocker(cfg),
+		Docker:       NewDocker(cfg),
 	}
 
 	infolist, err := m.Docker.List()
@@ -95,14 +93,16 @@ func (m *Mirage) isDockerHost(host string) bool {
 		}
 
 		subdomain := strings.ToLower(strings.Split(host, ".")[0])
-		index := sort.StringSlice(subdomainList).Search(subdomain)
-		if index < len(subdomainList) && subdomainList[index] == subdomain {
+		sortedList := sort.StringSlice(subdomainList)
+		sortedList.Sort()
+		index := sortedList.Search(subdomain)
+		if index < len(sortedList) && sortedList[index] == subdomain {
 			// found
 			return true
 		}
 
 		return false
-	} 
+	}
 
 	return false
 }
@@ -117,5 +117,3 @@ func isSameHost(s1 string, s2 string) bool {
 
 	return lower1 == lower2
 }
-
-
