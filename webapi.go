@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"fmt"
 
-	"github.com/acidlemon/rocket"
+	"github.com/acidlemon/rocket/v1"
 )
 
 
