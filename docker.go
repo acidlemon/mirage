@@ -1,16 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 	"sort"
 
-	"github.com/fsouza/go-dockerclient"
 	"github.com/acidlemon/go-dumper"
+	"github.com/fsouza/go-dockerclient"
 )
-
 
 type Information struct {
 	ID        string `json:"id"`
@@ -22,12 +21,14 @@ type Information struct {
 }
 
 type Docker struct {
-	cfg *Config
+	cfg     *Config
+	Storage *MirageStorage
 }
 
-func NewDocker(cfg *Config) *Docker {
+func NewDocker(cfg *Config, ms *MirageStorage) *Docker {
 	d := &Docker{
-		cfg: cfg,
+		cfg:     cfg,
+		Storage: ms,
 	}
 
 	return d
@@ -41,9 +42,9 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 	}
 
 	opt := docker.CreateContainerOptions{
-		Config: &docker.Config {
+		Config: &docker.Config{
 			Image: image,
-			Env: []string{ fmt.Sprintf("GIT_BRANCH=%s", gitbranch) },
+			Env:   []string{fmt.Sprintf("GIT_BRANCH=%s", gitbranch)},
 		},
 	}
 
@@ -61,8 +62,7 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 
 	container, err = client.InspectContainer(container.ID)
 
-	ms := NewMirageStorage()
-	defer ms.Close()
+	ms := d.Storage
 
 	// terminate old container
 	oldContainerID := d.getContainerIDFromSubdomain(subdomain, ms)
@@ -74,11 +74,11 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 	}
 
 	info := Information{
-		ID: container.ID,
-		ShortID: container.ID[0:12],
+		ID:        container.ID,
+		ShortID:   container.ID[0:12],
 		SubDomain: subdomain,
 		GitBranch: gitbranch,
-		Image: image,
+		Image:     image,
 		IPAddress: container.NetworkSettings.IPAddress,
 	}
 	var infoData []byte
@@ -114,8 +114,7 @@ func (d *Docker) getContainerIDFromSubdomain(subdomain string, ms *MirageStorage
 }
 
 func (d *Docker) Terminate(subdomain string) error {
-	ms := NewMirageStorage()
-	defer ms.Close()
+	ms := d.Storage
 
 	containerID := d.getContainerIDFromSubdomain(subdomain, ms)
 
@@ -137,6 +136,7 @@ func (d *Docker) Terminate(subdomain string) error {
 
 // extends docker.APIContainers for sort pkg
 type ContainerSlice []docker.APIContainers
+
 func (c ContainerSlice) Len() int {
 	return len(c)
 }
@@ -147,7 +147,6 @@ func (c ContainerSlice) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
-
 func (d *Docker) List() ([]Information, error) {
 	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
 	if err != nil {
@@ -155,7 +154,7 @@ func (d *Docker) List() ([]Information, error) {
 		log.Fatal(err)
 	}
 
-	ms := NewMirageStorage()
+	ms := d.Storage
 	subdomainList, err := ms.GetSubdomainList()
 	if err != nil {
 		return nil, err
@@ -186,5 +185,3 @@ func (d *Docker) List() ([]Information, error) {
 
 	return result, nil
 }
-
-

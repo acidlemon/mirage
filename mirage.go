@@ -16,14 +16,17 @@ type Mirage struct {
 	WebApi       *WebApi
 	ReverseProxy *ReverseProxy
 	Docker       *Docker
+	Storage      *MirageStorage
 }
 
 func Setup(cfg *Config) {
+	ms := NewMirageStorage()
 	m := &Mirage{
 		Config:       cfg,
 		WebApi:       NewWebApi(cfg),
 		ReverseProxy: NewReverseProxy(cfg),
-		Docker:       NewDocker(cfg),
+		Docker:       NewDocker(cfg, ms),
+		Storage:      ms,
 	}
 
 	infolist, err := m.Docker.List()
@@ -86,7 +89,7 @@ func (m *Mirage) ServeHTTPWithPort(w http.ResponseWriter, req *http.Request, por
 
 func (m *Mirage) isDockerHost(host string) bool {
 	if strings.HasSuffix(host, m.Config.Host.ReverseProxySuffix) {
-		ms := NewMirageStorage()
+		ms := m.Storage
 		subdomainList, err := ms.GetSubdomainList()
 		if err != nil {
 			return false
