@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"flag"
+	"fmt"
 )
 
 var (
-	version string
+	version   string
 	buildDate string
 )
 
@@ -29,5 +29,3 @@ func main() {
 	Setup(cfg)
 	Run()
 }
-
-

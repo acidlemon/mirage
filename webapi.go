@@ -1,18 +1,16 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
+	"net/http"
 
 	"github.com/acidlemon/rocket/v1"
 )
-
 
 type WebApi struct {
 	rocket.WebApp
 	cfg *Config
 }
-
 
 func NewWebApi(cfg *Config) *WebApi {
 	app := &WebApi{}
@@ -46,8 +44,8 @@ func (api *WebApi) List(c rocket.CtxData) {
 	if err != nil {
 		errStr = err.Error()
 	}
-	value := rocket.RenderVars {
-		"info" : info,
+	value := rocket.RenderVars{
+		"info":  info,
 		"error": errStr,
 	}
 
@@ -87,7 +85,7 @@ func (api *WebApi) ApiList(c rocket.CtxData) {
 		status = info
 	}
 
-	result := rocket.RenderVars {
+	result := rocket.RenderVars{
 		"result": status,
 	}
 
@@ -114,8 +112,8 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 	}
 
 	subdomain, _ := c.ParamSingle("subdomain")
-	branch   , _ := c.ParamSingle("branch")
-	image    , _ := c.ParamSingle("image")
+	branch, _ := c.ParamSingle("branch")
+	image, _ := c.ParamSingle("image")
 
 	status := "ok"
 
@@ -129,7 +127,7 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 		}
 	}
 
-	result := rocket.RenderVars {
+	result := rocket.RenderVars{
 		"result": status,
 	}
 
@@ -156,10 +154,9 @@ func (api *WebApi) terminate(c rocket.CtxData) rocket.RenderVars {
 		}
 	}
 
-	result := rocket.RenderVars {
+	result := rocket.RenderVars{
 		"result": status,
 	}
 
 	return result
 }
-

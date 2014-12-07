@@ -1,15 +1,14 @@
 package main
 
 import (
-	"fmt"
-	"log"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"log"
 
 	"code.google.com/p/leveldb-go/leveldb"
 	"code.google.com/p/leveldb-go/leveldb/db"
 	"github.com/acidlemon/go-dumper"
-
 )
 
 var ErrNotFound = errors.New("Not Found")
@@ -25,7 +24,7 @@ func NewMirageStorage() *MirageStorage {
 		log.Fatal(err)
 	}
 
-	ms := &MirageStorage{ storage: storage }
+	ms := &MirageStorage{storage: storage}
 
 	return ms
 }
@@ -118,7 +117,6 @@ func (ms *MirageStorage) GetSubdomainList() ([]string, error) {
 	return result, nil
 }
 
-
 func (ms *MirageStorage) updateSubdomainMap(subdomainMap map[string]int) error {
 	dump.Dump(subdomainMap)
 	subdomainData, err := json.Marshal(subdomainMap)
@@ -130,4 +128,3 @@ func (ms *MirageStorage) updateSubdomainMap(subdomainMap map[string]int) error {
 
 	return nil
 }
-

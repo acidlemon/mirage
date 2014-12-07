@@ -1,54 +1,54 @@
 package main
 
 import (
-	"log"
-	"io/ioutil"
 	"fmt"
-	"gopkg.in/yaml.v1"
 	"github.com/acidlemon/go-dumper"
+	"gopkg.in/yaml.v1"
+	"io/ioutil"
+	"log"
 )
 
 type Config struct {
-	Host Host                  `yaml:"host"`
-	Listen Listen              `yaml:"listen"`
-	Docker DockerCfg           `yaml:"docker"`
+	Host   Host      `yaml:"host"`
+	Listen Listen    `yaml:"listen"`
+	Docker DockerCfg `yaml:"docker"`
 }
 
 type Host struct {
-	WebApi string              `yaml:"webapi"`
-	ReverseProxySuffix string  `yaml:"reverse_proxy_suffix"`
+	WebApi             string `yaml:"webapi"`
+	ReverseProxySuffix string `yaml:"reverse_proxy_suffix"`
 }
 
 type Listen struct {
-	ForeignAddress string      `yaml:"foreign_address"`
-	HTTP []PortMap             `yaml:"http"`
-	HTTPS []PortMap            `yaml:"https"`
+	ForeignAddress string    `yaml:"foreign_address"`
+	HTTP           []PortMap `yaml:"http"`
+	HTTPS          []PortMap `yaml:"https"`
 }
 
 type PortMap struct {
-	ListenPort int             `yaml:"listen"`
-	TargetPort int             `yaml:"target"`
+	ListenPort int `yaml:"listen"`
+	TargetPort int `yaml:"target"`
 }
 
 type DockerCfg struct {
-	Endpoint string            `yaml:"endpoint"`
-	DefaultImage string        `yaml:"default_image"`
+	Endpoint     string `yaml:"endpoint"`
+	DefaultImage string `yaml:"default_image"`
 }
 
 func NewConfig(path string) *Config {
 	// default config
 	cfg := &Config{
 		Host: Host{
-			WebApi: "localhost",
+			WebApi:             "localhost",
 			ReverseProxySuffix: ".dev.example.net",
 		},
 		Listen: Listen{
 			ForeignAddress: "127.0.0.1",
-			HTTP: []PortMap{},
-			HTTPS: []PortMap{},
+			HTTP:           []PortMap{},
+			HTTPS:          []PortMap{},
 		},
 		Docker: DockerCfg{
-			Endpoint: "unix:///var/run/docker.sock",
+			Endpoint:     "unix:///var/run/docker.sock",
 			DefaultImage: "",
 		},
 	}
@@ -67,4 +67,3 @@ func NewConfig(path string) *Config {
 
 	return cfg
 }
-

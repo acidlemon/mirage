@@ -1,23 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httputil"
-	"strings"
-	"fmt"
 	"net/url"
+	"strings"
 
-//	"github.com/acidlemon/go-dumper"
+	//	"github.com/acidlemon/go-dumper"
 )
 
 type ReverseProxy struct {
-	cfg *Config
+	cfg       *Config
 	domainMap map[string]ProxyInformation
 }
 
-func NewReverseProxy(cfg *Config) *ReverseProxy{
+func NewReverseProxy(cfg *Config) *ReverseProxy {
 	return &ReverseProxy{
-		cfg: cfg,
+		cfg:       cfg,
 		domainMap: map[string]ProxyInformation{},
 	}
 }
@@ -38,9 +38,8 @@ func (r *ReverseProxy) ServeHTTPWithPort(w http.ResponseWriter, req *http.Reques
 	}
 }
 
-
 type ProxyInformation struct {
-	IPAddress string
+	IPAddress     string
 	proxyHandlers map[int]http.Handler
 }
 
@@ -60,7 +59,7 @@ func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 
 	// add to map
 	r.domainMap[subdomain] = ProxyInformation{
-		IPAddress: ipaddress,
+		IPAddress:     ipaddress,
 		proxyHandlers: handlers,
 	}
 }
@@ -68,6 +67,3 @@ func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 func (r *ReverseProxy) RemoveSubdomain(subdomain string) {
 	delete(r.domainMap, subdomain)
 }
-
-
-
