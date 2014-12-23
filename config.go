@@ -2,16 +2,18 @@ package main
 
 import (
 	"fmt"
-	"github.com/acidlemon/go-dumper"
-	"gopkg.in/yaml.v1"
 	"io/ioutil"
 	"log"
+
+	"github.com/acidlemon/go-dumper"
+	"gopkg.in/yaml.v1"
 )
 
 type Config struct {
-	Host   Host      `yaml:"host"`
-	Listen Listen    `yaml:"listen"`
-	Docker DockerCfg `yaml:"docker"`
+	Host    Host       `yaml:"host"`
+	Listen  Listen     `yaml:"listen"`
+	Docker  DockerCfg  `yaml:"docker"`
+	Storage StorageCfg `yaml:"storage"`
 }
 
 type Host struct {
@@ -35,6 +37,11 @@ type DockerCfg struct {
 	DefaultImage string `yaml:"default_image"`
 }
 
+type StorageCfg struct {
+	DataDir string `yaml:"datadir"`
+	HtmlDir string `yaml:"htmldir"`
+}
+
 func NewConfig(path string) *Config {
 	// default config
 	cfg := &Config{
@@ -50,6 +57,10 @@ func NewConfig(path string) *Config {
 		Docker: DockerCfg{
 			Endpoint:     "unix:///var/run/docker.sock",
 			DefaultImage: "",
+		},
+		Storage: StorageCfg{
+			DataDir: "./data",
+			HtmlDir: "./html",
 		},
 	}
 
