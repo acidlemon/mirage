@@ -32,3 +32,7 @@ docker:
   # if you specify this, fill the form as default value on web interface.
   # default_image: myapp:latest
 
+storage:
+  datadir: ./data
+  htmldir: ./html
+

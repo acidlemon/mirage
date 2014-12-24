@@ -17,8 +17,8 @@ type MirageStorage struct {
 	storage *leveldb.DB
 }
 
-func NewMirageStorage() *MirageStorage {
-	storage, err := leveldb.Open("./data", &db.Options{})
+func NewMirageStorage(cfg *Config) *MirageStorage {
+	storage, err := leveldb.Open(cfg.Storage.DataDir, &db.Options{})
 	if err != nil {
 		fmt.Println("cannot open leveldb")
 		log.Fatal(err)

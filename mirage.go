@@ -20,7 +20,7 @@ type Mirage struct {
 }
 
 func Setup(cfg *Config) {
-	ms := NewMirageStorage()
+	ms := NewMirageStorage(cfg)
 	m := &Mirage{
 		Config:       cfg,
 		WebApi:       NewWebApi(cfg),
