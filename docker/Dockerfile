@@ -2,22 +2,15 @@ FROM ubuntu
 MAINTAINER acidlemon
 
 RUN apt-get update
-RUN apt-get -y install git docker.io mercurial wget
+RUN apt-get -y install wget jq curl unzip
 
-# install go 1.4
-RUN wget https://storage.googleapis.com/golang/go1.4.linux-amd64.tar.gz 
-RUN tar -C /usr/local -xzf go1.4.linux-amd64.tar.gz
+WORKDIR /opt
 
-RUN mkdir /opt/mirage
-RUN mkdir /opt/gopath
-ENV GOPATH  /opt/gopath
-ENV PATH /opt/gopath/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN export MIRAGE_VERSION=`curl https://api.github.com/repos/acidlemon/mirage/releases | jq -r ".[0].tag_name"` && wget https://github.com/acidlemon/mirage/releases/download/${MIRAGE_VERSION}/mirage-${MIRAGE_VERSION}-linux-amd64.zip -O /opt/mirage.zip
+RUN unzip mirage.zip
 WORKDIR /opt/mirage
-RUN git clone https://github.com/acidlemon/mirage .
-RUN go get -v github.com/acidlemon/mirage
-RUN go build
+
 ADD config.yml /opt/mirage/config.yml
 
 CMD ./mirage
-
 
