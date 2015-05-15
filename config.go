@@ -10,10 +10,11 @@ import (
 )
 
 type Config struct {
-	Host    Host       `yaml:"host"`
-	Listen  Listen     `yaml:"listen"`
-	Docker  DockerCfg  `yaml:"docker"`
-	Storage StorageCfg `yaml:"storage"`
+	Host      Host       `yaml:"host"`
+	Listen    Listen     `yaml:"listen"`
+	Docker    DockerCfg  `yaml:"docker"`
+	Storage   StorageCfg `yaml:"storage"`
+	Parameter Paramters  `yaml:"parameters"`
 }
 
 type Host struct {
@@ -41,6 +42,14 @@ type StorageCfg struct {
 	DataDir string `yaml:"datadir"`
 	HtmlDir string `yaml:"htmldir"`
 }
+
+type Parameter struct {
+	Name string `yaml:"name"`
+	Env  string `yaml:"env"`
+	Rule string `yaml:"rule"`
+}
+
+type Paramters []*Parameter
 
 func NewConfig(path string) *Config {
 	// default config

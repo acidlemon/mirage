@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 
 	"github.com/acidlemon/rocket/v1"
 )
@@ -159,4 +160,26 @@ func (api *WebApi) terminate(c rocket.CtxData) rocket.RenderVars {
 	}
 
 	return result
+}
+
+func (api *WebApi) loadParameter(c rocket.CtxData) (map[string]string, error) {
+	var parameter map[string]string = make(map[string]string)
+
+	for _, v := range api.cfg.Parameter {
+		param, _ := c.ParamSingle(v.Name)
+		if param == "" {
+			continue
+		}
+
+		if v.Rule != "" {
+			paramRegex := regexp.MustCompile(v.Rule)
+			if !paramRegex.MatchString(param) {
+				return nil, fmt.Errorf("parameter %s value is rule error", v.Name)
+			}
+		}
+
+		parameter[v.Name] = param
+	}
+
+	return parameter, nil
 }
