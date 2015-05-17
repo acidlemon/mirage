@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"regexp"
 
 	"github.com/acidlemon/go-dumper"
 	"gopkg.in/yaml.v1"
@@ -44,9 +45,10 @@ type StorageCfg struct {
 }
 
 type Parameter struct {
-	Name string `yaml:"name"`
-	Env  string `yaml:"env"`
-	Rule string `yaml:"rule"`
+	Name   string `yaml:"name"`
+	Env    string `yaml:"env"`
+	Rule   string `yaml:"rule"`
+	Regexp regexp.Regexp
 }
 
 type Paramters []*Parameter
@@ -82,6 +84,12 @@ func NewConfig(path string) *Config {
 		log.Fatalf("powawa: %v", err)
 	}
 
+	for _, v := range cfg.Parameter {
+		if v.Rule != "" {
+			paramRegex := regexp.MustCompile(v.Rule)
+			v.Regexp = *paramRegex
+		}
+	}
 	fmt.Println("Config:")
 	dump.Dump(cfg)
 

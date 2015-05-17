@@ -61,12 +61,12 @@ func TestLoadParameter(t *testing.T) {
 parameters:
   - name: branch
     env: GIT_BRANCH
-    rule: "[0-9a-z]{1,32}"
+    rule: "[0-9a-z]{5,32}"
   - name: nick
     env: NICK
     rule: "[0-9A-Za-z]{1,10}"
   - name: test
-    env: NICK
+    env: TEST
     rule:
 `
 	if err := ioutil.WriteFile(f.Name(), []byte(data), 0644); err != nil {
@@ -89,6 +89,23 @@ parameters:
 
 	if parameter["test"] != "dummy" {
 		t.Error(errors.New("could not parse parameter"))
+	}
+
+	params = url.Values{}
+	params.Set("nick", "mirageman")
+	params.Set("branch", "aaa")
+	params.Set("test", "dummy")
+
+	req, err = http.NewRequest("POST", fmt.Sprintf("localhost?%s", params.Encode()), nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	c = rocket.NewContext(req, args, nil)
+	_, err = app.loadParameter(c)
+
+	if err == nil {
+		t.Error("Not apply parameter rule")
 	}
 
 }
