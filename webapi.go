@@ -112,16 +112,24 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 	}
 
 	subdomain, _ := c.ParamSingle("subdomain")
-	branch, _ := c.ParamSingle("branch")
 	image, _ := c.ParamSingle("image")
+
+	parameter, err := api.loadParameter(c)
+	if err != nil {
+		result := rocket.RenderVars{
+			"result": err.Error(),
+		}
+
+		return result
+	}
 
 	status := "ok"
 
-	if subdomain == "" || branch == "" || image == "" {
-		status = fmt.Sprintf("parameter required: subdomain=%s, branch=%s, image=%s",
-			subdomain, branch, image)
+	if subdomain == "" || image == "" {
+		status = fmt.Sprintf("parameter required: subdomain=%s, image=%s",
+			subdomain, image)
 	} else {
-		err := app.Docker.Launch(subdomain, branch, image)
+		err := app.Docker.Launch(subdomain, image, parameter)
 		if err != nil {
 			status = err.Error()
 		}
@@ -159,4 +167,27 @@ func (api *WebApi) terminate(c rocket.CtxData) rocket.RenderVars {
 	}
 
 	return result
+}
+
+func (api *WebApi) loadParameter(c rocket.CtxData) (map[string]string, error) {
+	var parameter map[string]string = make(map[string]string)
+
+	for _, v := range api.cfg.Parameter {
+		param, _ := c.ParamSingle(v.Name)
+		if param == "" && v.Required == true {
+			return nil, fmt.Errorf("lack require parameter: %s", v.Name)
+		} else if param == "" {
+			continue
+		}
+
+		if v.Rule != "" {
+			if !v.Regexp.MatchString(param) {
+				return nil, fmt.Errorf("parameter %s value is rule error", v.Name)
+			}
+		}
+
+		parameter[v.Name] = param
+	}
+
+	return parameter, nil
 }

@@ -34,17 +34,26 @@ func NewDocker(cfg *Config, ms *MirageStorage) *Docker {
 	return d
 }
 
-func (d *Docker) Launch(subdomain string, gitbranch string, image string) error {
+func (d *Docker) Launch(subdomain string, image string, option map[string]string) error {
 	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
 	if err != nil {
 		fmt.Println("cannot create docker client")
 		return err
 	}
 
+	var dockerEnv []string = make([]string, 0)
+	for _, v := range d.cfg.Parameter {
+		if option[v.Name] == "" {
+			continue
+		}
+
+		dockerEnv = append(dockerEnv, fmt.Sprintf("%s=%s", v.Env, option[v.Name]))
+	}
+
 	opt := docker.CreateContainerOptions{
 		Config: &docker.Config{
 			Image: image,
-			Env:   []string{fmt.Sprintf("GIT_BRANCH=%s", gitbranch)},
+			Env:   dockerEnv,
 		},
 	}
 
@@ -77,7 +86,7 @@ func (d *Docker) Launch(subdomain string, gitbranch string, image string) error 
 		ID:        container.ID,
 		ShortID:   container.ID[0:12],
 		SubDomain: subdomain,
-		GitBranch: gitbranch,
+		GitBranch: option["branch"],
 		Image:     image,
 		IPAddress: container.NetworkSettings.IPAddress,
 	}

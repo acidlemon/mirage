@@ -1,4 +1,3 @@
-
 host:
   # web api host
   # you can use API and Web interface through this host
@@ -36,3 +35,8 @@ storage:
   datadir: ./data
   htmldir: ./html
 
+parameters:
+  - name: branch
+    env: GIT_BRANCH
+    rule: "[0-9a-z]{1,32}"
+    required: true
