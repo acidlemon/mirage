@@ -27,12 +27,12 @@ listen:
 
 docker:
   # if you use docker through http, specify like "http://localhost:4243"
-  endpoint: unix:///var/run/docker.sock
+  endpoint: unix:///docker.sock
 
   # if you specify this, fill the form as default value on web interface.
   # default_image: myapp:latest
 
 storage:
-  datadir: /mirage
-  htmldir: /opt/mirage/html
+  datadir: /data
+  htmldir: /html
 
