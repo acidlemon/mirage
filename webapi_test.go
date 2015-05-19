@@ -36,7 +36,7 @@ func TestLoadParameter(t *testing.T) {
 		t.Error(err)
 	}
 
-	if len(parameter) != 2 {
+	if len(parameter) != 1 {
 		t.Error(errors.New("could not parse parameter"))
 	}
 
