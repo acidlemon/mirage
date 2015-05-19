@@ -39,7 +39,9 @@ parameters:
   - name: branch
     env: GIT_BRANCH
     rule: "[0-9a-z]{1,32}"
+    require: true
 
   - name: nick
     env: NICK
     rule: "[0-9A-Za-z]{1,10}"
+    require: false
