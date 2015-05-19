@@ -62,15 +62,15 @@ parameters:
   - name: branch
     env: GIT_BRANCH
     rule: "[0-9a-z]{5,32}"
-    require: true
+    required: true
   - name: nick
     env: NICK
     rule: "[0-9A-Za-z]{1,10}"
-    require: false
+    required: false
   - name: test
     env: TEST
     rule:
-    require: false
+    required: false
 `
 	if err := ioutil.WriteFile(f.Name(), []byte(data), 0644); err != nil {
 		t.Error(err)

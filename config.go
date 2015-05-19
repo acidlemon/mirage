@@ -43,11 +43,11 @@ type StorageCfg struct {
 }
 
 type Parameter struct {
-	Name    string `yaml:"name"`
-	Env     string `yaml:"env"`
-	Rule    string `yaml:"rule"`
-	Require bool   `yaml:"require"`
-	Regexp  regexp.Regexp
+	Name     string `yaml:"name"`
+	Env      string `yaml:"env"`
+	Rule     string `yaml:"rule"`
+	Required bool   `yaml:"required"`
+	Regexp   regexp.Regexp
 }
 
 type Paramters []*Parameter

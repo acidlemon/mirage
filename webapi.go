@@ -174,7 +174,7 @@ func (api *WebApi) loadParameter(c rocket.CtxData) (map[string]string, error) {
 
 	for _, v := range api.cfg.Parameter {
 		param, _ := c.ParamSingle(v.Name)
-		if param == "" && v.Require == true {
+		if param == "" && v.Required == true {
 			return nil, fmt.Errorf("lack require parameter: %s", v.Name)
 		} else if param == "" {
 			continue

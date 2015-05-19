@@ -34,11 +34,11 @@ parameters:
   - name: branch
     env: GIT_BRANCH
     rule: "[0-9a-z-]{32}"
-    require: true
+    required: true
   - name: nick
     env: NICK
     rule: "[0-9A-Za-z]{10}"
-    require: false
+    required: false
 `
 
 	if err := ioutil.WriteFile(f.Name(), []byte(data), 0644); err != nil {
@@ -55,7 +55,7 @@ parameters:
 		t.Error("could not parse parameter")
 	}
 
-	if cfg.Parameter[0].Require != true {
+	if cfg.Parameter[0].Required != true {
 		t.Error("could not parse parameter")
 	}
 }
