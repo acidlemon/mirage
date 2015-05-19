@@ -1,12 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"regexp"
 
-	"github.com/acidlemon/go-dumper"
 	"gopkg.in/yaml.v1"
 )
 
@@ -90,8 +88,6 @@ func NewConfig(path string) *Config {
 			v.Regexp = *paramRegex
 		}
 	}
-	fmt.Println("Config:")
-	dump.Dump(cfg)
 
 	return cfg
 }
