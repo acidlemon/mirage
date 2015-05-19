@@ -125,9 +125,9 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 
 	status := "ok"
 
-	if subdomain == "" || parameter["branch"] == "" || image == "" {
-		status = fmt.Sprintf("parameter required: subdomain=%s, branch=%s, image=%s",
-			subdomain, parameter["branch"], image)
+	if subdomain == "" || image == "" {
+		status = fmt.Sprintf("parameter required: subdomain=%s, image=%s",
+			subdomain, image)
 	} else {
 		err := app.Docker.Launch(subdomain, image, parameter)
 		if err != nil {
@@ -174,7 +174,9 @@ func (api *WebApi) loadParameter(c rocket.CtxData) (map[string]string, error) {
 
 	for _, v := range api.cfg.Parameter {
 		param, _ := c.ParamSingle(v.Name)
-		if param == "" {
+		if param == "" && v.Require == true {
+			return nil, fmt.Errorf("lack require parameter: %s", v.Name)
+		} else if param == "" {
 			continue
 		}
 

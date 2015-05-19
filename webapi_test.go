@@ -62,12 +62,15 @@ parameters:
   - name: branch
     env: GIT_BRANCH
     rule: "[0-9a-z]{5,32}"
+    require: true
   - name: nick
     env: NICK
     rule: "[0-9A-Za-z]{1,10}"
+    require: false
   - name: test
     env: TEST
     rule:
+    require: false
 `
 	if err := ioutil.WriteFile(f.Name(), []byte(data), 0644); err != nil {
 		t.Error(err)
@@ -94,6 +97,22 @@ parameters:
 	params = url.Values{}
 	params.Set("nick", "mirageman")
 	params.Set("branch", "aaa")
+	params.Set("test", "dummy")
+
+	req, err = http.NewRequest("POST", fmt.Sprintf("localhost?%s", params.Encode()), nil)
+	if err != nil {
+		t.Error(err)
+	}
+
+	c = rocket.NewContext(req, args, nil)
+	_, err = app.loadParameter(c)
+
+	if err == nil {
+		t.Error("Not apply parameter rule")
+	}
+
+	params = url.Values{}
+	params.Set("nick", "mirageman")
 	params.Set("test", "dummy")
 
 	req, err = http.NewRequest("POST", fmt.Sprintf("localhost?%s", params.Encode()), nil)
