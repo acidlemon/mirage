@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 
 	//	"github.com/acidlemon/go-dumper"
+	"github.com/methane/rproxy"
 )
 
 type ReverseProxy struct {
@@ -50,7 +50,7 @@ func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 	for _, v := range r.cfg.Listen.HTTP {
 		destUrlString := fmt.Sprintf("http://%s:%d", ipaddress, v.TargetPort)
 		destUrl, _ := url.Parse(destUrlString)
-		handler := httputil.NewSingleHostReverseProxy(destUrl)
+		handler := rproxy.NewSingleHostReverseProxy(destUrl)
 
 		handlers[v.ListenPort] = handler
 	}
