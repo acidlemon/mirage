@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/acidlemon/rocket/v1"
+	"gopkg.in/acidlemon/rocket.v1"
 )
 
 type WebApi struct {
