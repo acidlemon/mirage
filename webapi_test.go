@@ -9,7 +9,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/acidlemon/rocket/v1"
+	"gopkg.in/acidlemon/rocket.v1"
 )
 
 func TestLoadParameter(t *testing.T) {
