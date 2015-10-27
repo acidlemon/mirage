@@ -2,12 +2,14 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 
-	"code.google.com/p/leveldb-go/leveldb"
-	"code.google.com/p/leveldb-go/leveldb/db"
+	"github.com/syndtr/goleveldb/leveldb"
+	"github.com/syndtr/goleveldb/leveldb/errors"
+	"github.com/syndtr/goleveldb/leveldb/opt"
+	"github.com/syndtr/goleveldb/leveldb/storage"
+
 	"github.com/acidlemon/go-dumper"
 )
 
@@ -18,7 +20,13 @@ type MirageStorage struct {
 }
 
 func NewMirageStorage(cfg *Config) *MirageStorage {
-	storage, err := leveldb.Open(cfg.Storage.DataDir, &db.Options{})
+	fileStorage, err := storage.OpenFile(cfg.Storage.DataDir)
+	if err != nil {
+		fmt.Println("cannot open leveldb fileStorage")
+		log.Fatal(err)
+	}
+
+	storage, err := leveldb.Open(fileStorage, &opt.Options{})
 	if err != nil {
 		fmt.Println("cannot open leveldb")
 		log.Fatal(err)
@@ -35,7 +43,7 @@ func (ms *MirageStorage) Close() {
 
 func (ms *MirageStorage) Get(key string) ([]byte, error) {
 	data, err := ms.storage.Get([]byte(key), nil)
-	if err == db.ErrNotFound {
+	if err == errors.ErrNotFound {
 		err = ErrNotFound
 	}
 
@@ -43,7 +51,7 @@ func (ms *MirageStorage) Get(key string) ([]byte, error) {
 }
 
 func (ms *MirageStorage) Set(key string, value []byte) error {
-	err := ms.storage.Set([]byte(key), value, &db.WriteOptions{Sync: true})
+	err := ms.storage.Put([]byte(key), value, &opt.WriteOptions{Sync: true})
 
 	return err
 }
