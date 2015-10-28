@@ -53,11 +53,6 @@ curl http://docker.dev.example.net/api/terminate \
 6. Now, you can access to container using "http://cool-feature.dev.exmaple.net/".
 7. Press "Terminate" button.
 
-
-Currently, v0.1 only support "branch" variable using `GIT_BRANCH`
-environment variables.
-
-
 Setup
 ------
 
