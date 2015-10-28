@@ -7,7 +7,6 @@ import (
 	"log"
 	"sort"
 
-	"github.com/acidlemon/go-dumper"
 	"github.com/fsouza/go-dockerclient"
 )
 
@@ -116,7 +115,7 @@ func (d *Docker) getContainerIDFromSubdomain(subdomain string, ms *MirageStorage
 	}
 	var info Information
 	json.Unmarshal(data, &info)
-	dump.Dump(info)
+	//dump.Dump(info)
 	containerID := string(info.ID)
 
 	return containerID
@@ -182,7 +181,7 @@ func (d *Docker) List() ([]Information, error) {
 
 		var info Information
 		err = json.Unmarshal(infoData, &info)
-		dump.Dump(info)
+		//dump.Dump(info)
 
 		index := sort.Search(len(containers), func(i int) bool { return containers[i].ID >= info.ID })
 

@@ -9,8 +9,6 @@ import (
 	"github.com/syndtr/goleveldb/leveldb/errors"
 	"github.com/syndtr/goleveldb/leveldb/opt"
 	"github.com/syndtr/goleveldb/leveldb/storage"
-
-	"github.com/acidlemon/go-dumper"
 )
 
 var ErrNotFound = errors.New("Not Found")
@@ -126,7 +124,7 @@ func (ms *MirageStorage) GetSubdomainList() ([]string, error) {
 }
 
 func (ms *MirageStorage) updateSubdomainMap(subdomainMap map[string]int) error {
-	dump.Dump(subdomainMap)
+	//dump.Dump(subdomainMap)
 	subdomainData, err := json.Marshal(subdomainMap)
 
 	err = ms.Set("subdomain-map", subdomainData)
