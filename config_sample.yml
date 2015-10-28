@@ -38,5 +38,12 @@ storage:
 parameters:
   - name: branch
     env: GIT_BRANCH
-    rule: "[0-9a-z]{1,32}"
+    rule: ""
     required: true
+  # add your custom parameters here!
+  # name is parameter name (passed by HTTP parameter)
+  # env is environment variable for docker container
+  # rule is constraint of value using regexp.
+  # required means required or optional parameter (boolean value)
+
+

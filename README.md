@@ -53,6 +53,23 @@ curl http://docker.dev.example.net/api/terminate \
 6. Now, you can access to container using "http://cool-feature.dev.exmaple.net/".
 7. Press "Terminate" button.
 
+### Customization
+
+Mirage now supports custom parameter. Write your parameter on config.yml.
+
+Mirage contains default parameter "branch" as below.
+
+```
+parameters:
+  - name: branch
+    env: GIT_BRANCH
+    rule: ""
+    required: true
+```
+
+You can add custom parameter. "rule" option is regexp string.
+
+
 Setup
 ------
 
