@@ -55,6 +55,7 @@ func (api *WebApi) List(c rocket.CtxData) {
 func (api *WebApi) Launcher(c rocket.CtxData) {
 	c.Render(api.cfg.Storage.HtmlDir+"/launcher.html", rocket.RenderVars{
 		"DefaultImage": api.cfg.Docker.DefaultImage,
+		"Parameters":   api.cfg.Parameter,
 	})
 }
 

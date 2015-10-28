@@ -4,22 +4,25 @@
 
 <div class="col-md-6">
 <form id="launcher" method="POST" action="/launch">
-<p>
-  <label for="subdomain" class="col-md-4 text-right">subdomain </label>
+  <label for="subdomain" class="col-md-3 text-right">subdomain </label>
   <input type="text" name="subdomain" value="" id="subdomain"
-         class="col-md-8" placeholder="mybranch">
-</p>
-<p>
-  <label for="branch" class="col-md-4 text-right">branch </label>
-  <input type="text" name="branch" value="" id="branch"
-         class="col-md-8" placeholder="feature/mine">
-</p>
-<p>
-  <label for="image" class="col-md-4 text-right">image </label>
+         class="col-md-7" placeholder="mybranch">
+  <p class="col-md-2">*Required</p>
+
+{{ range $param := .Parameters }}
+
+  <label for="{{ $param.Name }}" class="col-md-3 text-right">{{ $param.Name }} </label>
+  <input type="text" name="{{ $param.Name }}" value="" id="{{ $param.Name }}"
+         class="col-md-7" placeholder="your {{ $param.Name }}" />
+  <p class="col-md-2">{{ if $param.Required }}*Required {{ else}} (optional) {{ end }}</p>
+
+{{ end }}
+
+  <label for="image" class="col-md-3 text-right">image </label>
   <input type="text" name="image" value="{{ .DefaultImage }}" id="image"
-         class="col-md-8" placeholder="myapp:latest">
-</p>
-<p class="text-right">
+         class="col-md-7" placeholder="myapp:latest">
+  <span class="col-md-2">*Required</span>
+  <p class="col-md-12 text-right">
   <input type="submit" class="btn btn-primary">
 </p>
 </form>
