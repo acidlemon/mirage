@@ -48,6 +48,7 @@ func (d *Docker) Launch(subdomain string, image string, option map[string]string
 
 		dockerEnv = append(dockerEnv, fmt.Sprintf("%s=%s", v.Env, option[v.Name]))
 	}
+	dockerEnv = append(dockerEnv, fmt.Sprintf("SUBDOMAIN=%s", subdomain))
 
 	opt := docker.CreateContainerOptions{
 		Config: &docker.Config{
