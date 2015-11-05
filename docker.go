@@ -2,9 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/fsouza/go-dockerclient"
@@ -22,24 +20,25 @@ type Information struct {
 type Docker struct {
 	cfg     *Config
 	Storage *MirageStorage
+	Client  *docker.Client
 }
 
 func NewDocker(cfg *Config, ms *MirageStorage) *Docker {
+	client, err := docker.NewClient(cfg.Docker.Endpoint)
+	if err != nil {
+		fmt.Println("cannot create docker client")
+		return nil
+	}
 	d := &Docker{
 		cfg:     cfg,
 		Storage: ms,
+		Client:  client,
 	}
 
 	return d
 }
 
 func (d *Docker) Launch(subdomain string, image string, option map[string]string) error {
-	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
-	if err != nil {
-		fmt.Println("cannot create docker client")
-		return err
-	}
-
 	var dockerEnv []string = make([]string, 0)
 	for _, v := range d.cfg.Parameter {
 		if option[v.Name] == "" {
@@ -57,26 +56,26 @@ func (d *Docker) Launch(subdomain string, image string, option map[string]string
 		},
 	}
 
-	container, err := client.CreateContainer(opt)
+	container, err := d.Client.CreateContainer(opt)
 	if err != nil {
 		fmt.Println("cannot create container")
 		return err
 	}
 
-	err = client.StartContainer(container.ID, nil)
+	err = d.Client.StartContainer(container.ID, nil)
 	if err != nil {
 		fmt.Println("cannot start container")
 		return err
 	}
 
-	container, err = client.InspectContainer(container.ID)
+	container, err = d.Client.InspectContainer(container.ID)
 
 	ms := d.Storage
 
 	// terminate old container
 	oldContainerID := d.getContainerIDFromSubdomain(subdomain, ms)
 	if oldContainerID != "" {
-		err = client.StopContainer(oldContainerID, 5)
+		err = d.Client.StopContainer(oldContainerID, 5)
 		if err != nil {
 			fmt.Printf(err.Error()) // TODO log warning
 		}
@@ -127,12 +126,7 @@ func (d *Docker) Terminate(subdomain string) error {
 
 	containerID := d.getContainerIDFromSubdomain(subdomain, ms)
 
-	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
-	if err != nil {
-		errors.New("cannot create docker client")
-	}
-
-	err = client.StopContainer(containerID, 5)
+	err := d.Client.StopContainer(containerID, 5)
 	if err != nil {
 		return err
 	}
@@ -157,19 +151,13 @@ func (c ContainerSlice) Swap(i, j int) {
 }
 
 func (d *Docker) List() ([]Information, error) {
-	client, err := docker.NewClient(d.cfg.Docker.Endpoint)
-	if err != nil {
-		fmt.Println("cannot create docker client")
-		log.Fatal(err)
-	}
-
 	ms := d.Storage
 	subdomainList, err := ms.GetSubdomainList()
 	if err != nil {
 		return nil, err
 	}
 
-	containers, _ := client.ListContainers(docker.ListContainersOptions{})
+	containers, _ := d.Client.ListContainers(docker.ListContainersOptions{})
 	sort.Sort(ContainerSlice(containers))
 
 	result := []Information{}
