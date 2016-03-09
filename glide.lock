@@ -1,0 +1,49 @@
+hash: 48c27cbc338c71c8da63cd19cda1424d98b0c83dcd2e07af9aaca7955bf14e63
+updated: 2016-03-09T13:37:06.365488804+09:00
+imports:
+- name: github.com/fsouza/go-dockerclient
+  version: 9b6c9720043b74304a6dd07a2a901d16e7bf3d3d
+  subpackages:
+  - external/github.com/docker/docker/opts
+  - external/github.com/docker/docker/pkg/archive
+  - external/github.com/docker/docker/pkg/fileutils
+  - external/github.com/docker/docker/pkg/homedir
+  - external/github.com/docker/docker/pkg/stdcopy
+  - external/github.com/hashicorp/go-cleanhttp
+  - external/github.com/Sirupsen/logrus
+  - external/github.com/docker/docker/pkg/idtools
+  - external/github.com/docker/docker/pkg/ioutils
+  - external/github.com/docker/docker/pkg/pools
+  - external/github.com/docker/docker/pkg/promise
+  - external/github.com/docker/docker/pkg/system
+  - external/github.com/docker/docker/pkg/longpath
+  - external/github.com/opencontainers/runc/libcontainer/user
+  - external/golang.org/x/sys/unix
+  - external/golang.org/x/net/context
+  - external/github.com/docker/go-units
+- name: github.com/golang/snappy
+  version: 5f1c01d9f64b941dd9582c638279d046eda6ca31
+- name: github.com/methane/rproxy
+  version: aafd1c66433b806c55dd87a10800df97485d1b8e
+- name: github.com/naoina/denco
+  version: 9af2ba0e24214bac003821f4a501b131b2e04c75
+- name: github.com/syndtr/goleveldb
+  version: ad0d8b2ab58a55ed5c58073aa46451d5e1ca1280
+  subpackages:
+  - leveldb
+  - leveldb/errors
+  - leveldb/opt
+  - leveldb/storage
+  - leveldb/cache
+  - leveldb/comparer
+  - leveldb/filter
+  - leveldb/iterator
+  - leveldb/journal
+  - leveldb/memdb
+  - leveldb/table
+  - leveldb/util
+- name: gopkg.in/acidlemon/rocket.v2
+  version: 2f36fbec9709c19a7530a54c73802d532be324e8
+- name: gopkg.in/yaml.v1
+  version: 9f9df34309c04878acc86042b16630b0f696e1de
+devImports: []

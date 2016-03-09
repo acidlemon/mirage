@@ -1,0 +1,8 @@
+package: github.com/acidlemon/mirage
+import:
+- package: github.com/syndtr/goleveldb
+  subpackages:
+  - leveldb
+  - leveldb/errors
+  - leveldb/opt
+  - leveldb/storage
