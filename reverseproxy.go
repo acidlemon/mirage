@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 
 	//	"github.com/acidlemon/go-dumper"
 	"github.com/methane/rproxy"
 )
 
 type ReverseProxy struct {
+	mu        sync.RWMutex
 	cfg       *Config
 	domainMap map[string]ProxyInformation
 }
@@ -25,17 +27,28 @@ func NewReverseProxy(cfg *Config) *ReverseProxy {
 func (r *ReverseProxy) ServeHTTPWithPort(w http.ResponseWriter, req *http.Request, port int) {
 	subdomain := strings.ToLower(strings.Split(req.Host, ".")[0])
 
-	if _, ok := r.domainMap[subdomain]; !ok {
-		fmt.Println("subdomain not found: ", subdomain)
-		http.NotFound(w, req)
-		return
-	}
-
-	if handler, ok := r.domainMap[subdomain].proxyHandlers[port]; ok {
+	if handler := r.findHandler(subdomain, port); handler != nil {
 		handler.ServeHTTP(w, req)
 	} else {
 		http.NotFound(w, req)
 	}
+}
+
+func (r *ReverseProxy) findHandler(subdomain string, port int) http.Handler {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	proxyInfo, ok := r.domainMap[subdomain]
+	if !ok {
+		return nil
+	}
+
+	handler, ok := proxyInfo.proxyHandlers[port]
+	if !ok {
+		return nil
+	}
+
+	return handler
 }
 
 type ProxyInformation struct {
@@ -58,6 +71,8 @@ func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 	fmt.Println("add subdomain: ", subdomain)
 
 	// add to map
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	r.domainMap[subdomain] = ProxyInformation{
 		IPAddress:     ipaddress,
 		proxyHandlers: handlers,
@@ -65,5 +80,7 @@ func (r *ReverseProxy) AddSubdomain(subdomain string, ipaddress string) {
 }
 
 func (r *ReverseProxy) RemoveSubdomain(subdomain string) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
 	delete(r.domainMap, subdomain)
 }
