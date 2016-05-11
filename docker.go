@@ -4,17 +4,19 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/fsouza/go-dockerclient"
 )
 
 type Information struct {
-	ID        string `json:"id"`
-	ShortID   string `json:"short_id"`
-	SubDomain string `json:"subdomain"`
-	GitBranch string `json:"branch"`
-	Image     string `json:"image"`
-	IPAddress string `json:"ipaddress"`
+	ID        string    `json:"id"`
+	ShortID   string    `json:"short_id"`
+	SubDomain string    `json:"subdomain"`
+	GitBranch string    `json:"branch"`
+	Image     string    `json:"image"`
+	IPAddress string    `json:"ipaddress"`
+	Created   time.Time `json:"created"`
 }
 
 type Docker struct {
@@ -88,6 +90,7 @@ func (d *Docker) Launch(subdomain string, image string, option map[string]string
 		GitBranch: option["branch"],
 		Image:     image,
 		IPAddress: container.NetworkSettings.IPAddress,
+		Created:   container.Created,
 	}
 	var infoData []byte
 	infoData, err = json.Marshal(info)
