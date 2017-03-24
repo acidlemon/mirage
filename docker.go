@@ -40,7 +40,7 @@ func NewDocker(cfg *Config, ms *MirageStorage) *Docker {
 	return d
 }
 
-func (d *Docker) Launch(subdomain string, image string, option map[string]string) error {
+func (d *Docker) Launch(subdomain string, image string, name string, option map[string]string) error {
 	var dockerEnv []string = make([]string, 0)
 	for _, v := range d.cfg.Parameter {
 		if option[v.Name] == "" {
@@ -52,6 +52,7 @@ func (d *Docker) Launch(subdomain string, image string, option map[string]string
 	dockerEnv = append(dockerEnv, fmt.Sprintf("SUBDOMAIN=%s", subdomain))
 
 	opt := docker.CreateContainerOptions{
+		Name: name,
 		Config: &docker.Config{
 			Image: image,
 			Env:   dockerEnv,
