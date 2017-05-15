@@ -114,6 +114,14 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 
 	subdomain, _ := c.ParamSingle("subdomain")
 	image, _ := c.ParamSingle("image")
+	name, _ := c.ParamSingle("name")
+
+	// Default container name is set same as subdomain when it is empty.
+	// 'name' will be unique because subdomains should not be duplicated.
+	// If the subdomain is duplicated, should returns error.
+	if name == "" {
+		name = subdomain
+	}
 
 	parameter, err := api.loadParameter(c)
 	if err != nil {
@@ -130,7 +138,7 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 		status = fmt.Sprintf("parameter required: subdomain=%s, image=%s",
 			subdomain, image)
 	} else {
-		err := app.Docker.Launch(subdomain, image, parameter)
+		err := app.Docker.Launch(subdomain, image, name, parameter)
 		if err != nil {
 			status = err.Error()
 		}
