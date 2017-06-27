@@ -57,6 +57,7 @@ func (d *Docker) Launch(subdomain string, image string, name string, option map[
 			Image: image,
 			Env:   dockerEnv,
 		},
+		HostConfig: d.cfg.Docker.HostConfig,
 	}
 
 	container, err := d.Client.CreateContainer(opt)
