@@ -36,7 +36,9 @@ docker:
   #   # means `docker run -p 45000-46000:12345/tcp`
   #   PortBindings:
   #     "12345/tcp":
-  #       HostPort: "45000-46000"
+  #      -  HostPort: "45000-46000"
+  #  # means `docker run --rm`
+  #   AutoRemove: true
 
 storage:
   datadir: ./data
