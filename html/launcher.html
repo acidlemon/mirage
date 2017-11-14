@@ -6,31 +6,32 @@
 <form id="launcher" method="POST" action="/launch">
   <label for="subdomain" class="col-md-2 text-right">subdomain </label>
   <input type="text" name="subdomain" value="" id="subdomain"
-         class="col-md-3" placeholder="mybranch">
-  <p class="col-md-7">*Required</p>
+         class="col-md-5" placeholder="mybranch">
+  <p class="col-md-5">*Required</p>
 
 {{ range $param := .Parameters }}
 
   <label for="{{ $param.Name }}" class="col-md-2 text-right">{{ $param.Name }} </label>
   <input type="text" name="{{ $param.Name }}" value="" id="{{ $param.Name }}"
-         class="col-md-3" placeholder="your {{ $param.Name }}" />
-  <p class="col-md-7">{{ if $param.Required }}*Required {{ else}} (optional) {{ end }}</p>
+         class="col-md-5" placeholder="your {{ $param.Name }}" />
+  <p class="col-md-5">{{ if $param.Required }}*Required {{ else}} (optional) {{ end }}</p>
 
 {{ end }}
 
   <label for="image" class="col-md-2 text-right">image </label>
   <input type="text" name="image" value="{{ .DefaultImage }}" id="image"
-         class="col-md-3" placeholder="myapp:latest">
-  <span class="col-md-7">*Required</span>
-  <p class="col-md-12 text-right"></p>
+         class="col-md-5" placeholder="myapp:latest">
+  <p class="col-md-5">*Required</p>
 
   <label for="name" class="col-md-2 text-right">container name </label>
   <input type="text" name="name" value="" id="container_name"
-         class="col-md-3" placeholder="">
-  <span class="col-md-7">optional: same as 'subdomain' if empty </span>
-  <p class="col-md-12 text-right">
-  <input type="submit" class="btn btn-primary">
-</p>
+         class="col-md-5" placeholder="default is 'subdomain-abcde' (random 5 letter suffix)">
+  <p class="col-md-5">Optional</p>
+
+  <p class="col-md-7"></p>
+  <p class="col-md-5 text-left">
+    <input type="submit" class="btn btn-primary">
+  </p>
 </form>
 </div>
 
