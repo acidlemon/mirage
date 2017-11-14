@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 
 	"gopkg.in/acidlemon/rocket.v2"
@@ -116,11 +117,8 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 	image, _ := c.ParamSingle("image")
 	name, _ := c.ParamSingle("name")
 
-	// Default container name is set same as subdomain when it is empty.
-	// 'name' will be unique because subdomains should not be duplicated.
-	// If the subdomain is duplicated, should returns error.
 	if name == "" {
-		name = subdomain
+		name = subdomain + "-" + randomString(5)
 	}
 
 	parameter, err := api.loadParameter(c)
@@ -199,4 +197,14 @@ func (api *WebApi) loadParameter(c rocket.CtxData) (map[string]string, error) {
 	}
 
 	return parameter, nil
+}
+
+const rsLetters = "0123456789abcdef"
+
+func randomString(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = rsLetters[rand.Intn(len(rsLetters))]
+	}
+	return string(b)
 }
