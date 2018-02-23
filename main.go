@@ -3,12 +3,18 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
+	"time"
 )
 
 var (
 	version   string
 	buildDate string
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 func main() {
 	confFile := flag.String("conf", "config.yml", "specify config file")
