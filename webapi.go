@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
+	"time"
 
 	"gopkg.in/acidlemon/rocket.v2"
 )
@@ -202,6 +203,7 @@ func (api *WebApi) loadParameter(c rocket.CtxData) (map[string]string, error) {
 const rsLetters = "0123456789abcdef"
 
 func randomString(n int) string {
+	rand.Seed(time.Now().UnixNano())
 	b := make([]byte, n)
 	for i := range b {
 		b[i] = rsLetters[rand.Intn(len(rsLetters))]
