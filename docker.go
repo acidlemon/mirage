@@ -57,6 +57,16 @@ func (d *Docker) Launch(subdomain string, image string, name string, option map[
 			Image: image,
 			Env:   dockerEnv,
 		},
+		HostConfig: d.cfg.Docker.HostConfig,
+	}
+
+	// fill opt.Config.ExposedPorts
+	if len(opt.HostConfig.PortBindings) != 0 {
+		opt.Config.ExposedPorts = make(map[docker.Port]struct{},
+			len(opt.HostConfig.PortBindings))
+		for key := range opt.HostConfig.PortBindings {
+			opt.Config.ExposedPorts[key] = struct{}{}
+		}
 	}
 
 	container, err := d.Client.CreateContainer(opt)

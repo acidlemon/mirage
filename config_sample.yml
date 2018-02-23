@@ -31,6 +31,15 @@ docker:
   # if you specify this, fill the form as default value on web interface.
   # default_image: myapp:latest
 
+  # specify host_config, see https://godoc.org/github.com/fsouza/go-dockerclient#HostConfig
+  # host_config:
+  #   # means `docker run -p 45000-46000:12345/tcp`
+  #   PortBindings:
+  #     "12345/tcp":
+  #      -  HostPort: "45000-46000"
+  #  # means `docker run --rm`
+  #   AutoRemove: true
+
 storage:
   datadir: ./data
   htmldir: ./html
