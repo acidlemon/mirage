@@ -159,7 +159,9 @@ func (d *Docker) Logs(subdomain, since, tail string) ([]string, error) {
 		ErrorStream:  buf,
 		Tail:         tail,
 
-		Since: parsedSince,
+		Since:  parsedSince,
+		Stdout: true,
+		Stderr: true,
 	}
 
 	err := d.Client.Logs(opt)
