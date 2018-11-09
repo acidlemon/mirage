@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -133,6 +135,49 @@ func (d *Docker) getContainerIDFromSubdomain(subdomain string, ms *MirageStorage
 	containerID := string(info.ID)
 
 	return containerID
+}
+
+func (d *Docker) Logs(subdomain, since, tail string) ([]string, error) {
+	buf := &bytes.Buffer{}
+
+	var parsedSince int64
+	if since != "" {
+		t, err := time.Parse(time.RFC3339, since)
+		if err != nil {
+			return nil, fmt.Errorf("cannot parse since: %s", err)
+		}
+		parsedSince = t.Unix()
+	}
+	containerID := d.getContainerIDFromSubdomain(subdomain, d.Storage)
+	if containerID == "" {
+		return nil, fmt.Errorf("subdomain=%s is not found", subdomain)
+	}
+
+	opt := docker.LogsOptions{
+		Container:    containerID,
+		OutputStream: buf,
+		ErrorStream:  buf,
+		Tail:         tail,
+
+		Since: parsedSince,
+	}
+
+	err := d.Client.Logs(opt)
+	if err != nil {
+		return nil, fmt.Errorf("fail to output logs %s", err)
+	}
+
+	scanner := bufio.NewScanner(buf)
+
+	logs := make([]string, 0, 50)
+	for scanner.Scan() {
+		logs = append(logs, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, fmt.Errorf("fail to scan outputs of log: %s", err)
+	}
+
+	return logs, nil
 }
 
 func (d *Docker) Terminate(subdomain string) error {

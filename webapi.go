@@ -27,6 +27,7 @@ func NewWebApi(cfg *Config) *WebApi {
 	app.AddRoute("/terminate", app.Terminate, view)
 	app.AddRoute("/api/list", app.ApiList, view)
 	app.AddRoute("/api/launch", app.ApiLaunch, view)
+	app.AddRoute("/api/logs", app.ApiLogs, view)
 	app.AddRoute("/api/terminate", app.ApiTerminate, view)
 
 	app.BuildRouter()
@@ -99,6 +100,12 @@ func (api *WebApi) ApiLaunch(c rocket.CtxData) {
 	c.RenderJSON(result)
 }
 
+func (api *WebApi) ApiLogs(c rocket.CtxData) {
+	result := api.logs(c)
+
+	c.RenderJSON(result)
+}
+
 func (api *WebApi) ApiTerminate(c rocket.CtxData) {
 	result := api.terminate(c)
 
@@ -149,6 +156,35 @@ func (api *WebApi) launch(c rocket.CtxData) rocket.RenderVars {
 	}
 
 	return result
+}
+
+func (api *WebApi) logs(c rocket.CtxData) rocket.RenderVars {
+	if c.Req().Method != "GET" {
+		c.Res().StatusCode = http.StatusMethodNotAllowed
+		c.RenderText("you must use GET")
+		return rocket.RenderVars{}
+	}
+
+	subdomain, _ := c.ParamSingle("subdomain")
+	since, _ := c.ParamSingle("since")
+	tail, _ := c.ParamSingle("tail")
+
+	if subdomain == "" {
+		return rocket.RenderVars{
+			"result": "parameter required: subdomain",
+		}
+	}
+
+	logs, err := app.Docker.Logs(subdomain, since, tail)
+	if err != nil {
+		return rocket.RenderVars{
+			"result": err.Error(),
+		}
+	}
+
+	return rocket.RenderVars{
+		"result": logs,
+	}
 }
 
 func (api *WebApi) terminate(c rocket.CtxData) rocket.RenderVars {
